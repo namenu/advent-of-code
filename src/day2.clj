@@ -3,23 +3,6 @@
 
 (def input (->> "day2.in" io/resource io/reader line-seq))
 
-(def input1 ["abcdef"
-             "bababc"
-             "abbcde"
-             "abcccd"
-             "aabcdd"
-             "abcdee"
-             "ababab"])
-
-(def input2 ["abcde"
-             "fghij"
-             "klmno"
-             "pqrst"
-             "fguij"
-             "axcye"
-             "wvxyz"])
-
-
 (defn fingerprint [id]
   (let [occurs (into #{} (vals (frequencies id)))]
     [(if (occurs 2) 1 0)

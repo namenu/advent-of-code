@@ -5,15 +5,12 @@
 
 (def input (->> "day3.in" io/resource io/reader line-seq))
 
-(def input ["#1 @ 1,3: 4x4"
-            "#2 @ 3,1: 4x4"
-            "#3 @ 5,5: 2x2"])
-
 (defn ->claim [s]
   (let [[_ id _ _ x y _ w h :as T] (str/split s #"[^\d]")
         [id x y w h] (mapv read-string [id x y w h])]
     {:id   id
      :rect [x y (+ x w) (+ y h)]}))
+
 
 (defn overlap? [[ax1 ay1 ax2 ay2] [bx1 by1 bx2 by2]]
   (and (> ax2 bx1)
@@ -23,7 +20,6 @@
 
 (defn area [x1 y1 x2 y2]
   (* (- x2 x1) (- y2 y1)))
-
 
 (defn part1 [input]
   (let [rects (map (comp :rect ->claim) input)
@@ -52,4 +48,5 @@
                               (or (= id id2)
                                   (not (overlap? rect rect2))))
                            claims)))
-         first)))
+         first
+         :id)))
