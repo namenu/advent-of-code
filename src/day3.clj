@@ -1,7 +1,6 @@
 (ns day3
   (:require [clojure.java.io :as io]
-            [clojure.string :as str]
-            [clojure.set :as set]))
+            [clojure.string :as str]))
 
 (def input (->> "day3.in" io/resource io/reader line-seq))
 
