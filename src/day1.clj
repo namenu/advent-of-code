@@ -1,8 +1,6 @@
 (ns day1
   (:require [clojure.java.io :as io]))
 
-(def input (->> "day1.in" io/resource io/reader line-seq))
-
 (defn part1 [input]
   (reduce + (map read-string input)))
 

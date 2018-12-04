@@ -1,7 +1,4 @@
-(ns day2
-  (:require [clojure.java.io :as io]))
-
-(def input (->> "day2.in" io/resource io/reader line-seq))
+(ns day2)
 
 (defn fingerprint [id]
   (let [occurs (into #{} (vals (frequencies id)))]
