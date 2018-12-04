@@ -3,27 +3,25 @@
 
 (defn parse-record [s]
   (let [[_ datetime msg] (re-find #"\[(.+)\] (.+)" s)
-        record {:minute (->> (re-find #":(\d+)$" datetime) second Integer.)
+        record {:minute (->> (re-find #":(\d+)$" datetime) second Integer/parseInt)
                 :type   (cond
                           (str/starts-with? msg "Guard") :shift
                           (str/starts-with? msg "falls") :asleep
                           (str/starts-with? msg "wakes") :awake)}]
     (if (= (:type record) :shift)
-      (let [id (Integer. (re-find #"\d+" msg))]
+      (let [id (Integer/parseInt (re-find #"\d+" msg))]
         (assoc record :id id))
       record)))
 
 (defn input->records [input]
-  (let [records (map parse-record (sort input))
-        by-id   (loop [[r & records] records
-                       id  nil
-                       out {}]
-                  (if-let [{:keys [type minute]} r]
-                    (if (= type :shift)
-                      (recur records (:id r) out)
-                      (recur records id (update out id (fnil conj []) minute)))
-                    out))]
-    (reduce-kv (fn [m k v] (assoc m k (partition 2 v))) {} by-id)))
+  (->> (map parse-record (sort input))
+       (reduce (fn [{:keys [state] :as acc} record]
+                 (case (:type record)
+                   :shift (assoc-in acc [:state :id] (:id record))
+                   :asleep (assoc-in acc [:state :start] (:minute record))
+                   :awake (update-in acc [:result (:id state)] conj [(:start state) (:minute record)])))
+               {:result {} :state {}})
+       :result))
 
 (defn most-sleepy-minute [intervals]
   (let [stats (for [m (range 60)
