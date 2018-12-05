@@ -1,11 +1,10 @@
-(ns day1
-  (:require [clojure.java.io :as io]))
+(ns day1)
 
 (defn part1 [input]
-  (reduce + (map read-string input)))
+  (reduce + (map Integer/parseInt input)))
 
 (defn part2 [input]
-  (loop [freq (cycle (map read-string input))
+  (loop [freq (cycle (map Integer/parseInt input))
          sum  0
          seen #{}]
     (let [f (+ sum (first freq))]
