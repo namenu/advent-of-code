@@ -25,10 +25,12 @@
     (apply min (map collapse-length removed))))
 
 
-(comment
-  (require '[clojure.java.io :as io])
+;; tests
+(require '[clojure.test :refer [deftest is run-tests]])
 
-  (def input "dabAcCaCBAcCcaDA")
-  (def input (->> "day5.in" io/resource slurp))
+(deftest test-day5
+  (let [input "dabAcCaCBAcCcaDA"]
+    (is (= 10 (part1 input)))
+    (is (= 4 (part2 input)))))
 
-  )
+(run-tests)
