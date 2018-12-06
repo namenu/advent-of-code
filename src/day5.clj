@@ -9,20 +9,22 @@
 (defn collapse [polymer pattern]
   (str/replace polymer pattern ""))
 
-(defn collapse-length [polymer]
-  (loop [polymer polymer]
-    (let [destroyed (str/replace polymer react-pattern "")]
-      (if (= (count polymer) (count destroyed))
-        (count polymer)
-        (recur destroyed)))))
+(defn collapsed-length [polymer]
+  (->> (iterate #(collapse % react-pattern) polymer)
+       (partition 2 1)
+       (take-while (fn [[before after]] (not= (count before) (count after))))
+       last
+       second
+       count))
 
 (defn part1 [input]
-  (collapse-length input))
+  (collapsed-length input))
 
 (defn part2 [input]
-  (let [removing (map (comp re-pattern str) lower (repeat "|") upper)
-        removed  (map (partial collapse input) removing)]
-    (apply min (map collapse-length removed))))
+  (let [removing (map (comp re-pattern str) lower (repeat "|") upper)]
+    (->> (map (partial collapse input) removing)
+         (map collapse-length)
+         (apply min))))
 
 
 ;; tests
