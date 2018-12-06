@@ -1,5 +1,4 @@
-(ns day6
-  (:require [clojure.string :as str]))
+(ns day6)
 
 (defn parse [s]
   (let [[_ x y] (re-find #"(\d+), (\d+)" s)]
@@ -43,10 +42,10 @@
                                      (conj %1 [%2 c])
                                      %1))
                                 {}))
-        inf-point? (infinite-points bbox distmap)
-        areas      (reduce #(update %1 (val %2) (fnil inc 0)) {} distmap)]
-    (->> areas
-         (remove (fn [[k v]] (inf-point? k)))
+        areamap    (reduce #(update %1 (val %2) (fnil inc 0)) {} distmap)
+        inf-point? (infinite-points bbox distmap)]
+    (->> areamap
+         (remove (fn [[k _]] (inf-point? k)))
          (apply max-key second)
          second)))
 

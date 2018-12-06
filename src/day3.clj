@@ -2,7 +2,7 @@
   (:require [clojure.string :as str]))
 
 (defn ->claim [s]
-  (let [[_ id _ _ x y _ w h :as T] (str/split s #"[^\d]")
+  (let [[_ id _ _ x y _ w h] (str/split s #"[^\d]")
         [id x y w h] (mapv #(Integer/parseInt %) [id x y w h])]
     {:id   id
      :rect [x y (+ x w) (+ y h)]}))

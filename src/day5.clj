@@ -9,6 +9,7 @@
 (defn collapse [polymer pattern]
   (str/replace polymer pattern ""))
 
+; TODO: O(n) using stack
 (defn collapsed-length [polymer]
   (->> (iterate #(collapse % react-pattern) polymer)
        (partition 2 1)
@@ -23,7 +24,7 @@
 (defn part2 [input]
   (let [removing (map (comp re-pattern str) lower (repeat "|") upper)]
     (->> (map (partial collapse input) removing)
-         (map collapse-length)
+         (map collapsed-length)
          (apply min))))
 
 
