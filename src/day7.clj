@@ -30,18 +30,11 @@
            result ""]
       (if (empty? todo)
         result
-        (let [comparator (fn [x y]
-                           (let [gx (count (deps x))
-                                 gy (count (deps y))]
-                             (if (= gx gy)
-                               (< (int x) (int y))
-                               (< gx gy))))
-              nodes      (apply sorted-set-by comparator todo)
-              top        (first nodes)]
-          (recur (disj nodes top)
-                 (remove-node deps top)
-                 (str result top)))))))
-
+        (let [no-deps (filter #(empty? (deps %)) todo)
+              task    (first (sort no-deps))]
+          (recur (disj todo task)
+                 (remove-node deps task)
+                 (str result task)))))))
 
 (defn worker-available? [workers]
   (< (count workers) *num-workers*))
@@ -67,19 +60,12 @@
         (if (empty? todo)
           ; wait all workers
           (second (apply max-key val workers))
-          (let [comparator   (fn [x y]
-                               (let [gx (count (deps x))
-                                     gy (count (deps y))]
-                                 (if (= gx gy)
-                                   (< (int x) (int y))
-                                   (< gx gy))))
-                top          (first (apply sorted-set-by comparator todo))
-
-                schedulable? (empty? (deps top))]
-            (if (and schedulable? (worker-available? workers))
+          (let [no-deps (filter #(empty? (deps %)) todo)
+                task    (first (sort no-deps))]
+            (if (and task (worker-available? workers))
               (recur elapsed
-                     (schedule workers top elapsed)
-                     (disj todo top)
+                     (schedule workers task elapsed)
+                     (disj todo task)
                      deps)
               (let [[[task time] workers] (wait-till-available workers)]
                 (recur time workers todo (remove-node deps task))))))))))
