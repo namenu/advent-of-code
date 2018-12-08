@@ -66,7 +66,7 @@
 ;; tests
 (require '[clojure.test :refer [deftest is run-tests]])
 
-(deftest test-day5
+(deftest test-day6
   (let [input ["1, 1"
                "1, 6"
                "8, 3"
