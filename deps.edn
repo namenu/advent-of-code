@@ -1,4 +1,5 @@
-{:deps {org.clojure/test.check {:mvn/version "0.10.0-alpha3"}
+{:deps {org.clojure/data.finger-tree {:mvn/version "0.0.3"}
+        org.clojure/test.check {:mvn/version "0.10.0-alpha3"}
         org.clojure/core.async {:mvn/version "0.4.474"}}
  :paths ["src" "resources"]
  :aliases {:test {:extra-paths ["test"]
