@@ -21,14 +21,14 @@
          marble    1
          score-map {}]
     (if (> marble last-marble)
-      score-map
-      (let [player (mod marble num-players)
-            player (if (= 0 player) num-players player)]
-        (let [[circle score] (place circle marble)
-              score-map (update score-map player (fnil + 0) score)]
-          (recur circle (inc marble) score-map))))))
+      (->> score-map (apply max-key val) (second))
+      (let [[circle score] (place circle marble)
+            player (mod marble num-players)]
+        (recur circle (inc marble) (update score-map player (fnil + 0) score))))))
 
 (comment
-  ;459 71790
-  (time
-    (apply max-key val (play 459 7179000))))
+  (time (play 459 71790))
+  "Elapsed time: 151.743266 msecs"
+  (time (play 459 7179000))
+  "Elapsed time: 11923.412965 msecs"
+  )
