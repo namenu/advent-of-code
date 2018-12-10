@@ -33,29 +33,30 @@
 (def input (->> "day10.in" io/resource io/reader line-seq))
 (def elves (map ->elf input))
 
-; part2
-(gather elves)
+; part2 answer
+(def end-t (gather elves))
 
-(def width 500)
 
-(defn lerp2 [end a b]
+;; rendition
+
+(defn lerp2
+  "Simple easing function with double lerp."
+  [end a b]
   (fn [start]
     (-> start
         (q/lerp end a)
         (q/lerp end b))))
 
-(def timing-fn (lerp2 10369 0.05 0.005))
+(def width 500)
+(def timing-fn (lerp2 end-t 0.05 0.005))
 (def epsilon 1e-4)
 
-
 (defn setup []
-  (let [input (->> "day10.in" io/resource io/reader line-seq)
-        elves (map ->elf input)]
-    {:elves elves
-     :t     0.0}))
+  (q/frame-rate 60)
+  {:elves elves
+   :t     0.0})
 
 (defn update-state [{:keys [t elves] :as state}]
-  (q/frame-rate 60)
   (let [t' (timing-fn t)
         dt (- t' t)]
     (if (< dt epsilon)
@@ -69,6 +70,7 @@
   (q/stroke 255)
   (q/stroke-weight 3)
 
+  ; padding
   (q/translate 20 20)
 
   (let [bbox        (bounding-box (map first elves))
@@ -85,12 +87,6 @@
   (def input (->> "day10.in" io/resource io/reader line-seq))
   (def elves (map ->elf input))
 
-  (update-pos 1 elves)
-  (let [scale 10000
-        t     (/ scale)]
-    (map (fn [[[x y] [vx vy]]]
-           [[(+ x (* vx t)) (+ y (* vy t))] [vx vy]]) elves))
-
   (run-sketch)
   )
 
@@ -103,43 +99,3 @@
     :features [:keep-on-top]
     :middleware [fun-mode]))
 
-
-;; tests
-(require '[clojure.test :refer [deftest testing is run-tests]])
-
-(deftest test-day8
-  (let [input ["position=< 9,  1> velocity=< 0,  2>"
-               "position=< 7,  0> velocity=<-1,  0>"
-               "position=< 3, -2> velocity=<-1,  1>"
-               "position=< 6, 10> velocity=<-2, -1>"
-               "position=< 2, -4> velocity=< 2,  2>"
-               "position=<-6, 10> velocity=< 2, -2>"
-               "position=< 1,  8> velocity=< 1, -1>"
-               "position=< 1,  7> velocity=< 1,  0>"
-               "position=<-3, 11> velocity=< 1, -2>"
-               "position=< 7,  6> velocity=<-1, -1>"
-               "position=<-2,  3> velocity=< 1,  0>"
-               "position=<-4,  3> velocity=< 2,  0>"
-               "position=<10, -3> velocity=<-1,  1>"
-               "position=< 5, 11> velocity=< 1, -2>"
-               "position=< 4,  7> velocity=< 0, -1>"
-               "position=< 8, -2> velocity=< 0,  1>"
-               "position=<15,  0> velocity=<-2,  0>"
-               "position=< 1,  6> velocity=< 1,  0>"
-               "position=< 8,  9> velocity=< 0, -1>"
-               "position=< 3,  3> velocity=<-1,  1>"
-               "position=< 0,  5> velocity=< 0, -1>"
-               "position=<-2,  2> velocity=< 2,  0>"
-               "position=< 5, -2> velocity=< 1,  2>"
-               "position=< 1,  4> velocity=< 2,  1>"
-               "position=<-2,  7> velocity=< 2, -2>"
-               "position=< 3,  6> velocity=<-1, -1>"
-               "position=< 5,  0> velocity=< 1,  0>"
-               "position=<-6,  0> velocity=< 2,  0>"
-               "position=< 5,  9> velocity=< 1, -2>"
-               "position=<14,  7> velocity=<-2,  0>"
-               "position=<-3,  6> velocity=< 2, -1>"]]
-    (is (= 3 (time (part2 input)))))
-  )
-
-;(run-tests)

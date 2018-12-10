@@ -1,4 +1,4 @@
-(ns year2018.day3
+(ns year2018.day03
   (:require [clojure.string :as str]))
 
 (defn ->claim [s]

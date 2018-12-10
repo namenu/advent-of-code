@@ -1,4 +1,4 @@
-(ns year2018.day2)
+(ns year2018.day02)
 
 (defn fingerprint [id]
   (let [occurs (into #{} (vals (frequencies id)))]

@@ -1,4 +1,4 @@
-(ns year2018.day4
+(ns year2018.day04
   (:require [clojure.string :as str]))
 
 (defn parse-record [s]

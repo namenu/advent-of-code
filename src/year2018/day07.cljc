@@ -1,4 +1,4 @@
-(ns year2018.day7)
+(ns year2018.day07)
 
 (defn parse [s]
   (let [[_ x y] (re-find #"Step (\S) must be finished before step (\S) can begin." s)]
@@ -88,7 +88,7 @@
 
   (comment
     (require '[clojure.java.io :as io])
-    (let [input (->> "day7.in" io/resource io/reader line-seq)]))
+    (let [input (->> "day07.in" io/resource io/reader line-seq)]))
   )
 
 (run-tests)

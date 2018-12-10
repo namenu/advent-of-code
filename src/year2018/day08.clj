@@ -1,4 +1,4 @@
-(ns year2018.day8
+(ns year2018.day08
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 
@@ -48,7 +48,7 @@
 
   (comment
     (require '[clojure.java.io :as io])
-    (def input (->> "day8.in" io/resource io/reader line-seq)))
+    (def input (->> "day08.in" io/resource io/reader line-seq)))
   )
 
 (run-tests)

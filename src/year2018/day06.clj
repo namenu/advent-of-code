@@ -1,4 +1,4 @@
-(ns year2018.day6)
+(ns year2018.day06)
 
 (defn parse [s]
   (let [[_ x y] (re-find #"(\d+), (\d+)" s)]
@@ -78,7 +78,7 @@
 
   (comment
     (require '[clojure.java.io :as io])
-    (let [input (->> "day6.in" io/resource io/reader line-seq)]))
+    (let [input (->> "day06.in" io/resource io/reader line-seq)]))
   )
 
 (run-tests)

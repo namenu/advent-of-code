@@ -1,4 +1,4 @@
-(ns year2018.day9
+(ns year2018.day09
   (:require [clojure.data.finger-tree :refer [double-list conjl]])
   (:import (java.util ArrayDeque)
            (clojure.data.finger_tree DoubleList)))
