@@ -1,4 +1,4 @@
-(ns day1)
+(ns year2018.day1)
 
 (defn part1 [input]
   (reduce + (map #(Integer/parseInt %) input)))

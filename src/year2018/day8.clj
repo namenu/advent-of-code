@@ -1,4 +1,4 @@
-(ns day8
+(ns year2018.day8
   (:require [clojure.java.io :as io]
             [clojure.string :as str]))
 

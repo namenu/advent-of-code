@@ -1,4 +1,4 @@
-(ns day2)
+(ns year2018.day2)
 
 (defn fingerprint [id]
   (let [occurs (into #{} (vals (frequencies id)))]
@@ -24,3 +24,28 @@
                       :when (= (diff i j) 1)]
                   [i j]))]
     (common-letters x y)))
+
+
+;; tests
+(require '[clojure.test :refer [deftest is run-tests]])
+
+(deftest test-day2
+  (let [input ["abcdef"
+               "bababc"
+               "abbcde"
+               "abcccd"
+               "aabcdd"
+               "abcdee"
+               "ababab"]]
+    (is (= 12 (part1 input))))
+
+  (let [input ["abcde"
+               "fghij"
+               "klmno"
+               "pqrst"
+               "fguij"
+               "axcye"
+               "wvxyz"]]
+    (is (= "fgij" (part2 input)))))
+
+(run-tests)

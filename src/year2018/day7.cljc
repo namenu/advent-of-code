@@ -1,4 +1,4 @@
-(ns day7)
+(ns year2018.day7)
 
 (defn parse [s]
   (let [[_ x y] (re-find #"Step (\S) must be finished before step (\S) can begin." s)]

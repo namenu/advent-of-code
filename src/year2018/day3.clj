@@ -1,4 +1,4 @@
-(ns day3
+(ns year2018.day3
   (:require [clojure.string :as str]))
 
 (defn ->claim [s]
@@ -46,3 +46,16 @@
                            claims)))
          first
          :id)))
+
+
+;; tests
+(require '[clojure.test :refer [deftest is run-tests]])
+
+(deftest test-day3
+  (let [input ["#1 @ 1,3: 4x4"
+               "#2 @ 3,1: 4x4"
+               "#3 @ 5,5: 2x2"]]
+    (is (= 4 (part1 input)))
+    (is (= 3 (part2 input)))))
+
+(run-tests)

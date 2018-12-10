@@ -1,4 +1,4 @@
-(ns day6)
+(ns year2018.day6)
 
 (defn parse [s]
   (let [[_ x y] (re-find #"(\d+), (\d+)" s)]
