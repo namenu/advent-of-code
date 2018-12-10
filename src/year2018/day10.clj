@@ -37,40 +37,44 @@
 (gather elves)
 
 (def width 500)
-(def max-t 10369)
+
+(defn lerp2 [end a b]
+  (fn [start]
+    (-> start
+        (q/lerp end a)
+        (q/lerp end b))))
+
+(def timing-fn (lerp2 10369 0.05 0.005))
+(def epsilon 1e-4)
+
 
 (defn setup []
-  (let [input     (->> "day10.in" io/resource io/reader line-seq)
-        elves     (map ->elf input)
-        bbox      (bounding-box (map first elves))
-        max-width (- (first (second bbox)) (ffirst bbox))]
+  (let [input (->> "day10.in" io/resource io/reader line-seq)
+        elves (map ->elf input)]
     {:elves elves
-     :bbox  (bounding-box (map first elves))
-     :scale (/ width max-width)
      :t     0.0}))
 
-(defn update-state [{:keys [t elves scale] :as state}]
+(defn update-state [{:keys [t elves] :as state}]
   (q/frame-rate 60)
-  (if (>= t max-t)
-    state
-    (let [dt        (/ 1.0 scale)
-          elves     (update-pos dt elves)
-          bbox      (bounding-box (map first elves))
-          max-width (- (first (second bbox)) (ffirst bbox))]
+  (let [t' (timing-fn t)
+        dt (- t' t)]
+    (if (< dt epsilon)
+      state
       (-> state
-          (update :t + dt)
-          (assoc :elves elves)
-          (assoc :bbox bbox)
-          (assoc :scale (/ width max-width))))))
+          (assoc :elves (update-pos dt elves))
+          (assoc :t t')))))
 
-(defn draw-state [{:keys [elves scale bbox]}]
+(defn draw-state [{:keys [elves]}]
   (q/background 0)
   (q/stroke 255)
   (q/stroke-weight 3)
 
   (q/translate 20 20)
 
-  (let [translation (first bbox)]
+  (let [bbox        (bounding-box (map first elves))
+        max-width   (- (first (second bbox)) (ffirst bbox))
+        scale       (/ width max-width)
+        translation (first bbox)]
     (doseq [[pos _] elves
             :let [[x y] (->> pos
                              (map #(- %2 %1) translation)
