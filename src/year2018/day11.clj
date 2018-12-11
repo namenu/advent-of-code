@@ -12,40 +12,41 @@
           (mod 10)
           (- 5)))))
 
-(def f (power-level 9306))
+(defn make-sum-grid [grid-serial]
+  (let [level-fn (power-level grid-serial)
+        sum      (fn [mem-sum x y]
+                   (let [sum (fn [x y] (mem-sum mem-sum x y))]
+                     (if (or (< x 1) (< y 1))
+                       0
+                       (let [x'   (sum (dec x) y)
+                             y'   (sum x (dec y))
+                             x'y' (sum (dec x) (dec y))
+                             xy   (level-fn x y)]
+                         (- (+ x' y' xy) x'y')))))
+        mem-sum  (memoize sum)]
+    (partial mem-sum mem-sum)))
 
-; TODO: memoize by power-grid.
-(def sum-1x1
-  (memoize
-    (fn [x y]
-      (if (or (< x 1) (< y 1))
-        0
-        (let [x'   (sum-1x1 (dec x) y)
-              y'   (sum-1x1 x (dec y))
-              x'y' (sum-1x1 (dec x) (dec y))
-              xy   (f x y)]
-          (- (+ x' y' xy) x'y'))))))
-
-(defn max-square [n]
+(defn max-square [sum-grid n]
   (let [[[right bottom] sum]
         (apply max-key second
                (for [x (range n 301)
                      y (range n 301)]
-                 (let [x'   (sum-1x1 (- x n) y)
-                       y'   (sum-1x1 x (- y n))
-                       x'y' (sum-1x1 (- x n) (- y n))
-                       xy   (sum-1x1 x y)]
+                 (let [x'   (sum-grid (- x n) y)
+                       y'   (sum-grid x (- y n))
+                       x'y' (sum-grid (- x n) (- y n))
+                       xy   (sum-grid x y)]
                    [[x y] (+ (- xy x' y') x'y')])))]
     [sum [(- right (dec n)) (- bottom (dec n))]]))
 
 
 (defn part1 [grid-serial]
-  (let [[_ [x y]] (max-square 3)]
+  (let [[_ [x y]] (max-square (make-sum-grid grid-serial) 3)]
     (str/join "," [x y])))
 
 (defn part2 [grid-serial]
-  (let [[[_ [x y]] n]
-        (apply max-key ffirst (pmap #(vector (max-square %) %) (range 1 301)))]
+  (let [sum-grid (make-sum-grid grid-serial)
+        max-by-n (pmap #(vector (max-square sum-grid %) %) (range 1 301))
+        [[_ [x y]] n] (apply max-key ffirst max-by-n)]
     (str/join "," [x y n])))
 
 
@@ -53,6 +54,14 @@
 (require '[clojure.test :refer [deftest testing is run-tests]])
 
 (deftest test-day11
+  (testing "sample input"
+    (is (= "33,45" (part1 18)))
+    (is (= "21,61" (part1 42)))
+
+    #_(is (= "90,269,16" (part2 18)))
+    #_(is (= "232,251,12" (part2 42)))
+    )
+
   (testing "memoized+pmap"
     (is (= "235,38") (time (part1 9306)))
     (is (= "233,146,13") (time (part2 9306)))
