@@ -2,13 +2,9 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]))
 
-
-(def input "initial state: #..#.#..##......###...###\n\n...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #")
-(def input (->> "day12.in" io/resource slurp))
-
 (def plant? #(= \# %))
 
-(defn parse-patterns [s]
+(defn parse-pattern [s]
   (let [[from to] (str/split s #" => ")]
     [(reduce (fn [acc c]
                (bit-or (bit-shift-left acc 1)
@@ -18,14 +14,14 @@
 (defn parse-input [input]
   (let [[state _ & patterns] (str/split-lines input)
         [_ gen0] (re-find #"initial state: (.*)" state)]
-    [gen0 (into {} (map parse-patterns patterns))]))
+    [{:pots gen0 :offset 0 :nth 0}
+     (into {} (map parse-pattern patterns))]))
 
-
-(defn evolve [patterns [gen leftmost]]
-  (loop [gen      (str gen "    ")
-         sig      0
-         next-gen []]
-    (if-let [cur (first gen)]
+(defn evolve [patterns {:keys [pots] :as state}]
+  (loop [pots      (str pots "    ")
+         sig       0
+         next-pots []]
+    (if-let [cur (first pots)]
       (let [sig (-> sig
                     (bit-shift-left 1)
                     (bit-and 31)
@@ -33,20 +29,58 @@
             c   (if (= (patterns sig) 1)
                   \#
                   \space)]
-        (recur (next gen)
+        (recur (next pots)
                sig
-               (conj next-gen c)))
+               (conj next-pots c)))
 
-      (let [[l r] (split-with (complement plant?) next-gen)]
-        [(str/trimr (apply str r))
-         (+ leftmost (- (count l) 2))])
-      )))
+      (let [[l r] (split-with (complement plant?) next-pots)]
+        (-> state
+            (assoc :pots (str/trimr (apply str r)))
+            (update :offset + (- (count l) 2))
+            (update :nth inc))))))
 
-
-(let [[gen0 patterns] (parse-input input)]
-  (loop [[gen idx] (nth (iterate (partial evolve patterns) [gen0 0]) 50000000000)
-         sum 0]
-    (if-let [c (first gen)]
-      (recur [(next gen) (inc idx)]
-             (+ sum (if (plant? c) idx 0)))
+(defn sum-pot-nums [{:keys [pots offset]}]
+  (loop [pots pots idx offset sum 0]
+    (if-let [c (first pots)]
+      (recur (next pots) (inc idx) (+ sum (if (plant? c) idx 0)))
       sum)))
+
+(defn part1 [input]
+  (let [[init patterns] (parse-input input)
+        generations (iterate (partial evolve patterns) init)]
+    (sum-pot-nums (nth generations 20))))
+
+(defn first-duplicate-key [key-fn xs]
+  (let [result (reduce (fn [seen x]
+                         (let [k (key-fn x)]
+                           (if (seen k)
+                             (reduced x)
+                             (conj seen k))))
+                       #{} xs)]
+    (if (set? result)
+      nil
+      result)))
+
+(defn part2 [input]
+  (let [[init patterns] (parse-input input)
+        gen-repeating (first-duplicate-key
+                        :pots
+                        (take 200 (iterate (partial evolve patterns) init)))
+        gen-50b       (-> gen-repeating
+                          (update :offset + (- 50000000000 (:nth gen-repeating)))
+                          (assoc :nth 50000000000))]
+    (sum-pot-nums gen-50b)))
+
+
+;; tests
+(require '[clojure.test :refer [deftest testing is run-tests]])
+
+(deftest test-day12
+  (let [input "initial state: #..#.#..##......###...###\n\n...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #"]
+    (is (= 325 (time (part1 input)))))
+
+  (let [input (->> "day12.in" io/resource slurp)]
+    (is (= 2767 (time (part1 input))))
+    (is (= 2650000001362 (time (part2 input))))))
+
+(run-tests)
