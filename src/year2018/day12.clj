@@ -1,6 +1,7 @@
 (ns year2018.day12
   (:require [clojure.string :as str]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [util :refer [first-duplicate-key]]))
 
 (def plant? #(= \# %))
 
@@ -49,17 +50,6 @@
   (let [[init patterns] (parse-input input)
         generations (iterate (partial evolve patterns) init)]
     (sum-pot-nums (nth generations 20))))
-
-(defn first-duplicate-key [key-fn xs]
-  (let [result (reduce (fn [seen x]
-                         (let [k (key-fn x)]
-                           (if (seen k)
-                             (reduced x)
-                             (conj seen k))))
-                       #{} xs)]
-    (if (set? result)
-      nil
-      result)))
 
 (defn part2 [input]
   (let [[init patterns] (parse-input input)
