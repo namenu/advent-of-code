@@ -117,6 +117,20 @@
         (print (track [x y])))
       (println))))
 
+(defn remove-carts [carts pos]
+  (remove #(= (:pos %) pos) carts))
+
+(defn remove-collisions [state]
+  (loop [state state]
+    (if-let [pos (:collision state)]
+      (-> state
+          (update :carts remove-carts pos)
+          (dissoc :collision))
+      (recur (update-state state)))))
+
+(defn print-carts [{:keys [carts]}]
+  (map #(dissoc % :opt) carts))
+
 (def input (->> "day13.in" io/resource slurp))
 
 (comment
@@ -124,31 +138,36 @@
   (def input "|\nv\n|\n|\n|\n^\n|\n")
   (def input "/->-\\        \n|   |  /----\\\n| /-+--+-\\  |\n| | |  | v  |\n\\-+-/  \\-+--/\n  \\------/   ")
 
+  (print-carts (nth (iterate remove-collisions state) 8))
+
   (loop [state (input->state input)]
     (prn (:tick state))
     (or (:collision state)
         (recur (update-state state))))
 
+  (def state (input->state input))
+  (def s3 )
+  (count (:carts s3))
 
-  #_(let [state* (iterate update-state state)
-          state  (first (drop-while (complement collision) state*))]
-      (let [out (with-out-str (print-state state))]
-        (spit "out.0" out))
-      (collision state))
+#_(let [state* (iterate update-state state)
+        state  (first (drop-while (complement collision) state*))]
+    (let [out (with-out-str (print-state state))]
+      (spit "out.0" out))
+    (collision state))
 
-  (->> (input->state input)
-       (iterate update-state)
-       #_(take-while (complement collision))
-       (take 300)
-       (map :carts)
-       (map (fn [carts] (map #(dissoc % :opt) carts))))
+(->> (input->state input)
+     (iterate update-state)
+     #_(take-while (complement collision))
+     (take 300)
+     (map :carts)
+     (map (fn [carts] (map #(dissoc % :opt) carts))))
 
-  (nth (iterate update-state state) 0)
-  (def state13
-    (nth (iterate update-state state) 13))
+(nth (iterate update-state state) 0)
+(def state13
+  (nth (iterate update-state state) 13))
 
-  (:carts (update-state state13))
-  )
+(:carts (update-state state13))
+)
 
 ;; tests
 (require '[clojure.test :refer [deftest testing is run-tests]])
