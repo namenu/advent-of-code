@@ -79,9 +79,6 @@
             (assoc :pos new-pos)
             (assoc :dir dir2)))
 
-      (= \space path)
-      (prn "SPACED")
-
       :else
       (assoc cart :pos new-pos)
       )))
@@ -149,13 +146,7 @@
   (def s3 )
   (count (:carts s3))
 
-#_(let [state* (iterate update-state state)
-        state  (first (drop-while (complement collision) state*))]
-    (let [out (with-out-str (print-state state))]
-      (spit "out.0" out))
-    (collision state))
-
-(->> (input->state input)
+  (->> (input->state input)
      (iterate update-state)
      #_(take-while (complement collision))
      (take 300)
