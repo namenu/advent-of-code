@@ -1,4 +1,5 @@
 (ns year2018.day16
+  (:refer-clojure :exclude [load])
   (:require [clojure.java.io :as io]
             [clojure.set :as set]))
 
@@ -13,7 +14,6 @@
   (update m :registers assoc r v))
 
 (def opcodes #{:addr :addi :mulr :muli :banr :bani :borr :bori :setr :seti :gtir :gtri :gtrr :eqir :eqri :eqrr})
-(set/intersection (set opcodes) [:addr :muli])
 
 (defn run-inst [m [op in1 in2 out]]
   (case op
@@ -73,47 +73,40 @@
                   (partition 3)
                   (map parse-sample)))
 
-@(def part1
-   (->> samples
-        (map sample->candidates)
-        (filter #(>= (count (second %)) 3))
-        (count)))
+(defn part1 []
+  (->> samples
+       (map sample->candidates)
+       (filter #(>= (count (second %)) 3))
+       (count)))
 
 
-(def opcode-map {0  :eqir
-                 1  :seti
-                 2  :eqri
-                 3  :eqrr
-                 4  :addi
-                 5  :setr
-                 6  :gtrr
-                 7  :gtri
-                 8  :muli
-                 9  :bori
-                 10 :bani
-                 11 :borr
-                 12 :gtir
-                 13 :banr
-                 14 :addr
-                 15 :mulr})
+(defn unification [candidates]
+  (let [init-map (zipmap (range 16) (repeat opcodes))]
+    (loop [opcode-map {}
+           to-find    (reduce (fn [res [op candidates]]
+                                (update res op set/intersection (set candidates)))
+                              init-map
+                              candidates)]
+      (let [found      (filter #(= 1 (count (val %))) to-find)
+            opcode-map (reduce (fn [m [k v]] (assoc m k (first v))) opcode-map found)
+            to-find    (reduce-kv (fn [m op candidates]
+                                    (let [v (set/difference candidates (set (vals opcode-map)))]
+                                      (if (empty? v)
+                                        m
+                                        (assoc m op v))))
+                                  {} to-find)]
+        (if (empty? to-find)
+          opcode-map
+          (recur opcode-map to-find))))))
 
-(def init-map (zipmap (range 16) (repeat opcodes)))
 
-(->> samples
-     (map sample->candidates)
-     (reduce (fn [res [op candidates]]
-               (update res op set/intersection (set candidates)))
-             init-map)
-     ; manually repeat eval with updated opcode-map
-     (map (fn [[op candidates]]
-            [op (set/difference candidates (set (vals opcode-map)))]))
-     (remove #(empty? (second %))))
+(def instructions (->> (-> "day16-2.in" io/resource io/reader line-seq)
+                       (map #(read-string (str "[" % "]")))))
 
-@(def instructions (->> (-> "day16-2.in" io/resource io/reader line-seq)
-                        (map #(read-string (str "[" % "]")))))
-
-(def part2 (reduce (fn [m [op & args]]
-                     (run-inst m (cons (opcode-map op) args)))
-                   (machine [0 0 0 0])
-                   instructions
-                   ))
+(defn part2 []
+  (let [candidates (map sample->candidates samples)
+        opcode-map (unification candidates)]
+    (reduce (fn [m [op & args]]
+              (run-inst m (cons (opcode-map op) args)))
+            (machine [0 0 0 0])
+            instructions)))
