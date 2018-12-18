@@ -50,16 +50,16 @@
               [x y]))))
 
 
-(print-state state)
+(defn resource-value [state minute]
+  (let [state' (->> (nth (iterate update-state state) minute)
+                    (map val)
+                    (frequencies))]
+    (* (state' \|)
+       (state' \#))))
 
-(def state10
-  (->>
-    (nth (iterate update-state state) 10)
-    (map val)
-    (frequencies)))
 
-(* (state10 \|)
-   (state10 \#))
+;part1
+(resource-value state 10)
 
 
 (defn find-cycle [coll]
@@ -69,21 +69,9 @@
     (let [c' (first rest)]
       (if-let [prev (seen c')]
         [prev (- nth prev)]
-        (recur rest (assoc seen c' nth) (inc nth)))
-      ))
-  )
+        (recur rest (assoc seen c' nth) (inc nth))))))
 
-
-(print-state (nth (iterate update-state state) 18))
-
-(find-cycle (iterate update-state state))
-#_(loop [state   state
-       minutes 0
-       seen    {(with-out-str (print-state next-state)) 0}]
-  (let [next-state (update-state state)
-        next-str   (with-out-str (print-state next-state))]
-    (if (seen next-str)
-      minutes)
-    )
-
-  )
+;part2
+(let [[n m] (find-cycle (iterate update-state state))
+      nth (+ n (mod (- 1000000000 n) m))]
+  (resource-value state nth))
