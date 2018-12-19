@@ -4,8 +4,13 @@
             [clojure.set :as set]))
 
 
-(defn machine [registers]
-  {:registers registers})
+(defn machine
+  ([registers]
+   {:registers registers})
+  ([registers ip-reg]
+   {:registers registers
+    :ip-reg    ip-reg
+    :ip        0}))
 
 (defn load [m r]
   (nth (:registers m) r))
@@ -16,46 +21,24 @@
 (def opcodes #{:addr :addi :mulr :muli :banr :bani :borr :bori :setr :seti :gtir :gtri :gtrr :eqir :eqri :eqrr})
 
 (defn run-inst [m [op in1 in2 out]]
-  (case op
-    :addr
-    (store m out (+ (load m in1) (load m in2)))
-    :addi
-    (store m out (+ (load m in1) in2))
-
-    :mulr
-    (store m out (* (load m in1) (load m in2)))
-    :muli
-    (store m out (* (load m in1) in2))
-
-    :banr
-    (store m out (bit-and (load m in1) (load m in2)))
-    :bani
-    (store m out (bit-and (load m in1) in2))
-
-    :borr
-    (store m out (bit-or (load m in1) (load m in2)))
-    :bori
-    (store m out (bit-or (load m in1) in2))
-
-    :setr
-    (store m out (load m in1))
-    :seti
-    (store m out in1)
-
-    :gtir
-    (store m out (if (> in1 (load m in2)) 1 0))
-    :gtri
-    (store m out (if (> (load m in1) in2) 1 0))
-    :gtrr
-    (store m out (if (> (load m in1) (load m in2)) 1 0))
-
-    :eqir
-    (store m out (if (= in1 (load m in2)) 1 0))
-    :eqri
-    (store m out (if (= (load m in1) in2) 1 0))
-    :eqrr
-    (store m out (if (= (load m in1) (load m in2)) 1 0))
-    ))
+  (let [v (case op
+            :addr (+ (load m in1) (load m in2))
+            :addi (+ (load m in1) in2)
+            :mulr (* (load m in1) (load m in2))
+            :muli (* (load m in1) in2)
+            :banr (bit-and (load m in1) (load m in2))
+            :bani (bit-and (load m in1) in2)
+            :borr (bit-or (load m in1) (load m in2))
+            :bori (bit-or (load m in1) in2)
+            :setr (load m in1)
+            :seti in1
+            :gtir (if (> in1 (load m in2)) 1 0)
+            :gtri (if (> (load m in1) in2) 1 0)
+            :gtrr (if (> (load m in1) (load m in2)) 1 0)
+            :eqir (if (= in1 (load m in2)) 1 0)
+            :eqri (if (= (load m in1) in2) 1 0)
+            :eqrr (if (= (load m in1) (load m in2)) 1 0))]
+    (store m out v)))
 
 (defn sample->candidates [[before [op in1 in2 out] after]]
   (let [candidates (filter #(= (:registers (run-inst before [% in1 in2 out]))
@@ -81,24 +64,23 @@
 
 
 (defn unification [candidates]
-  (let [init-map (zipmap (range 16) (repeat opcodes))]
-    (loop [opcode-map {}
-           to-find    (reduce (fn [res [op candidates]]
-                                (update res op set/intersection (set candidates)))
-                              init-map
-                              candidates)]
-      (let [found      (filter #(= 1 (count (val %))) to-find)
-            opcode-map (reduce (fn [m [k v]] (assoc m k (first v))) opcode-map found)
-            to-find    (reduce-kv (fn [m op candidates]
-                                    (let [v (set/difference candidates (set (vals opcode-map)))]
-                                      (if (empty? v)
-                                        m
-                                        (assoc m op v))))
-                                  {} to-find)]
-        (if (empty? to-find)
-          opcode-map
-          (recur opcode-map to-find))))))
+  (loop [opcode-map {}
+         to-find    (reduce (fn [res [op candidates]]
+                              (update res op (fnil set/intersection opcodes) (set candidates)))
+                            {}
+                            candidates)]
+    (let [found      (filter #(= 1 (count (val %))) to-find)
+          opcode-map (reduce (fn [m [k v]] (assoc m k (first v))) opcode-map found)
+          to-find    (reduce-kv (fn [m op candidates]
+                                  (let [v (set/difference candidates (apply set/union (map second found)))]
+                                    (if (empty? v)
+                                      m
+                                      (assoc m op v))))
+                                {} to-find)]
 
+      (if (empty? to-find)
+        opcode-map
+        (recur opcode-map to-find)))))
 
 (def instructions (->> (-> "day16-2.in" io/resource io/reader line-seq)
                        (map #(read-string (str "[" % "]")))))
