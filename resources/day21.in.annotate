@@ -1,0 +1,32 @@
+#ip 2
+0 seti 123 0 3        ; ---
+1 bani 3 456 3        ; ---
+2 eqri 3 72 3         ; ---
+3 addr 3 2 2          ; ---
+4 seti 0 0 2          ; ---
+5 seti 0 5 3          ; R3 = 0
+6 bori 3 65536 1      ; R1 = 2^16
+7 seti 10373714 2 3   ; R3 = 10373714
+8 bani 1 255 5        ;  R5 = 0
+9 addr 3 5 3          ;  R3 = R3 + R5
+10 bani 3 16777215 3  ;  R3 = R3 & (2^24)
+11 muli 3 65899 3     ;  R3 = R3 * 65899
+12 bani 3 16777215 3  ;  R3 = R3 & (2^24)
+13 gtir 256 1 5       ;  IF 256 > R1
+14 addr 5 2 2         ;  THEN
+15 addi 2 1 2         ;    JMP 28 ; HALT
+16 seti 27 7 2        ;  ELSE
+17 seti 0 3 5         ;    R5 = 0
+18 addi 5 1 4         ;    R4 = R5 + 1 = 1
+19 muli 4 256 4       ;    R4 = R4 << 8
+20 gtrr 4 1 4         ;    IF R4 > R1
+21 addr 4 2 2         ;    THEN
+22 addi 2 1 2         ;      JMP 26
+23 seti 25 4 2        ;    ELSE
+24 addi 5 1 5         ;      R5 = R5 + 1
+25 seti 17 0 2        ;    JMP 18
+26 setr 5 2 1         ;  R1 = R5
+27 seti 7 4 2         ;  JMP 8
+28 eqrr 3 0 5         ; IF R3 = R0
+29 addr 5 2 2         ; THEN HALT
+30 seti 5 7 2         ; ELSE JMP 6
