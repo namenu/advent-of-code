@@ -1,4 +1,5 @@
-(ns year2018.day06)
+(ns year2018.day06
+  (:require [util :refer [manhattan-dist]]))
 
 (defn parse [s]
   (let [[_ x y] (re-find #"(\d+), (\d+)" s)]
@@ -8,9 +9,6 @@
   (let [[min-x max-x] (apply (juxt min max) (map first points))
         [min-y max-y] (apply (juxt min max) (map second points))]
     [[min-x min-y] [max-x max-y]]))
-
-(defn manhattan-dist [[x1 y1] [x2 y2]]
-  (+ (Math/abs ^Integer (- x1 x2)) (Math/abs ^Integer (- y1 y2))))
 
 (defn closest-point [[x y] points]
   (let [[[c1 d1] [_ d2]] (->> points

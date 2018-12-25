@@ -1,7 +1,8 @@
 (ns year2018.day25
   (:require [clojure.string :as str]
             [clojure.set :as set]
-            [clojure.java.io :as io]))
+            [clojure.java.io :as io]
+            [util :refer [manhattan-dist]]))
 
 
 (defn input->points [input]
@@ -9,11 +10,8 @@
        (map #(str "[" % "]"))
        (mapv read-string)))
 
-(defn manhattan-dist [a b]
-  (reduce + (map #(Math/abs ^Integer (- %1 %2)) a b)))
-
 (defn connected? [a b]
-  (<= (manhattan-dist a b) 3))
+  (<= (util/manhattan-dist a b) 3))
 
 (defn find-graph [v G]
   (loop [spanning [v]

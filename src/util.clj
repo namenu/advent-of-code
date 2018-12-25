@@ -27,3 +27,6 @@
    (range start (inc end)))
   ([start end step]
    (range start (inc end) step)))
+
+(defn manhattan-dist [a b]
+  (reduce + (map #(Math/abs ^Integer (- %1 %2)) a b)))
