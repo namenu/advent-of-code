@@ -1,6 +1,6 @@
 (ns year2018.day22
-  (:require [util :refer [range-incl]]
-            [year2018.day06 :refer [manhattan-dist]]))
+  (:require [util :refer [range-incl manhattan-dist]]
+            [clojure.data.priority-map :refer [priority-map]]))
 
 
 ;(def depth 510)
@@ -77,40 +77,30 @@
                     (> v (+ m 7)))))))
 
 
-(defn promising? [from elapsed reach]
+(defn promising? [[from elapsed] reach]
   (let [estimate (+ elapsed
                     (manhattan-dist (:pos from) target)
                     (if (= (:equip from) :torch) 0 7))]
     (< estimate (or (reach target) upper-bound))))
+
+(defn neighbors [[frontier elapsed] reach]
+  (let [n1 (->> (moves frontier reach)
+                (map #(vector % (inc elapsed))))
+        n2 (->> (changes frontier reach)
+                (map #(vector % (+ elapsed 7))))]
+    (->> (into n1 n2))))
 
 
 (defn part2 []
   (let [init  {:pos   [0 0]
                :equip :torch}
         reach (loop [reach {init 0}
-                     queue [init]]
-                (if (empty? queue)
-                  reach
-                  (let [frontier (first queue)
-                        elapsed  (reach frontier)
-                        queue    (next queue)]
-                    (if (promising? frontier elapsed reach)
-                      (let
-                        [candidates (moves frontier reach)
-                         reach      (reduce (fn [reach candidate]
-                                              (assoc reach candidate (inc elapsed)))
-                                            reach
-                                            candidates)
-                         queue      (into queue candidates)
-
-                         candidates (changes frontier reach)
-                         reach      (reduce (fn [reach candidate]
-                                              (assoc reach candidate (+ elapsed 7)))
-                                            reach
-                                            candidates)
-                         queue      (into queue candidates)]
-                        (recur reach (sort-by reach queue)))
-                      (recur reach queue)))))]
+                     queue (priority-map init 0)]
+                (if-let [[frontier elapsed] (peek queue)]
+                  (let [candidates (->> (neighbors [frontier elapsed] reach)
+                                        (filter #(promising? % reach)))]
+                    (recur (into reach candidates) (into (pop queue) candidates)))
+                  reach))]
     (->> reach
          (filter #(= (:pos (first %)) target))
          (apply min-key second))))
