@@ -1,7 +1,7 @@
 (ns year2018.day20
   (:require [clojure.string :as str]
-            [clojure.java.io :as io])
-  (:import (clojure.lang PersistentQueue)))
+            [clojure.java.io :as io]
+            [graph :refer [bfs]]))
 
 (defn move [pos dir]
   (let [moves {\N [1 0]
@@ -54,16 +54,9 @@
       (str/replace "\"\"" "")
       (read-string)))
 
-(defn bfs [facility pos]
-  (loop [visited {pos 0}
-         queue   (conj PersistentQueue/EMPTY pos)]
-    (if-let [pos (peek queue)]
-      (let [neighbors (->> (map #(move pos %) (facility pos))
-                           (remove visited))
-            dist      (inc (visited pos))
-            visited'  (reduce (fn [visited pos] (assoc visited pos dist)) visited neighbors)]
-        (recur visited' (into (pop queue) neighbors)))
-      visited)))
+(defn neighboring [facility]
+  (fn [pos]
+    (map #(move pos %) (facility pos))))
 
 (def regex "^ENWWW(NEEE|SSE(EE|N))$")
 (def regex "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$")
@@ -75,11 +68,11 @@
   (first (traverse [{} [[0 0]]] (regex->edn regex))))
 
 ; part 1
-(->> (bfs facility [0 0])
+(->> (bfs [0 0] (neighboring facility))
      (apply max-key val)
      (second))
 
 ; part 2
-(->> (bfs facility [0 0])
+(->> (bfs [0 0] (neighboring facility))
      (filter #(>= (val %) 1000))
      (count))
