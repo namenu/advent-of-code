@@ -1,5 +1,8 @@
 (ns util)
 
+(defn find-first [pred coll]
+  (first (filter pred coll)))
+
 (defn first-duplicate-key [key-fn xs]
   (let [result (reduce (fn [seen x]
                          (let [k (key-fn x)]

@@ -2,12 +2,13 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
             [graph :refer [bfs]]
-            [util :refer [manhattan-dist]]))
+            [util :refer [find-first manhattan-dist] :as util]))
 
 (defn input->world [input]
   (let [cave (->> (str/split-lines input)
                   (map-indexed (fn [y line]
-                                 (into {} (map-indexed (fn [x c] [[y x] c]) line))))
+                                 (->> (map-indexed (fn [x c] [[y x] c]) line)
+                                      (into {}))))
                   (apply merge))]
     {:walls (->> (filter (fn [[_ v]] (= \# v)) cave)
                  (map first)
@@ -31,21 +32,19 @@
 (defn in-range? [u1 u2]
   (= 1 (manhattan-dist (:pos u1) (:pos u2))))
 
-(defn obstacle? [{:keys [walls units]} pos]
-  (or (walls pos)
-      (let [obstacles (->> (filter alive? units)
-                           (map :pos)
-                           (into #{}))]
-        (obstacles pos))))
+(defn nth-unit [world n]
+  (get-in world [:units n]))
 
-(defn neighbor* [world]
-  (fn [pos]
-    (->> [[-1 0] [1 0] [0 -1] [0 1]]
-         (map #(mapv + pos %))
-         (remove #(obstacle? world %)))))
+(defn alive-units [world]
+  (filter alive? (:units world)))
 
-(defn targets [{:keys [units]} unit]
-  (->> (filter alive? units)
+(defn obstacles [world]
+  (->> (alive-units world)
+       (map :pos)
+       (into (:walls world))))
+
+(defn targets [world unit]
+  (->> (alive-units world)
        (filter #(enemy? unit %))))
 
 (defn attack-target [world unit]
@@ -53,6 +52,12 @@
        (filter #(in-range? unit %))
        (sort-by (juxt :hp :pos))
        (first)))
+
+(defn neighbor* [world]
+  (fn [pos]
+    (->> [[-1 0] [1 0] [0 -1] [0 1]]
+         (map #(mapv + pos %))
+         (remove (obstacles world)))))
 
 (defn destination [world unit]
   (let [dist-map  (bfs (-> unit :pos) (neighbor* world))
@@ -65,57 +70,56 @@
          (sort-by (juxt dist-map identity))
          (first))))
 
-(defn to-move [world unit dst]
-  (let [move-map (bfs dst (neighbor* world))
-        adjacent (->> ((neighbor* world) (:pos unit))
+(defn next-pos [src dst adjacent]
+  (let [move-map (bfs dst adjacent)
+        adjacent (->> (adjacent src)
                       (filter move-map))]
     (->> adjacent
          (sort-by (juxt move-map identity))
          (first))))
 
-(defn approach [world unit]
-  (if (attack-target world unit)
-    world
-    (if-let [dst (destination world unit)]
-      (let [pos' (to-move world unit dst)]
-        (assoc-in world [:units (:id unit) :pos] pos'))
-      world)))
+(defn try-move [world index]
+  (let [unit (nth-unit world index)]
+    (if (attack-target world unit)
+      world
+      (if-let [dst (destination world unit)]
+        (let [pos' (next-pos (:pos unit) dst (neighbor* world))]
+          (assoc-in world [:units index :pos] pos'))
+        world))))
 
 (defn try-attack [world index]
-  (let [unit (get-in world [:units index])]
+  (let [unit (nth-unit world index)]
     (if-let [target (attack-target world unit)]
       (update-in world [:units (:id target) :hp] - (:power unit))
       world)))
 
 (defn turn [world index]
-  (let [unit (get-in world [:units index])]
+  (let [unit (nth-unit world index)]
     (if (alive? unit)
       (-> world
-          (approach unit)
-          (try-attack (:id unit)))
+          (try-move index)
+          (try-attack index))
       world)))
 
 (defn finished? [world]
-  (let [sides (->> (:units world)
-                   (filter alive?)
+  (let [sides (->> (alive-units world)
                    (group-by :side))]
     (= (count sides) 1)))
 
 (defn round [world]
-  (loop [world        world
-         units-to-act (->> (filter alive? (:units world))
-                           (sort-by :pos)
-                           (map :id))]
-    (if-let [u (first units-to-act)]
+  (loop [world      world
+         id-in-turn (->> (alive-units world)
+                         (sort-by :pos)
+                         (map :id))]
+    (if-let [u (first id-in-turn)]
       (if (finished? world)
         world
-        (recur (turn world u) (next units-to-act)))
+        (recur (turn world u) (next id-in-turn)))
       (update world :round inc))))
 
 (defn finish-combat [world]
   (->> (iterate round world)
-       (drop-while (complement finished?))
-       (first)))
+       (find-first finished?)))
 
 (defn outcome [world]
   (* (:round world)
@@ -127,54 +131,50 @@
 (comment
   ; 27730, 4988
   (def input "#######\n#.G...#\n#...EG#\n#.#.#G#\n#..G#E#\n#.....#\n#######")
-
   ; 36334, 29064
   (def input "#######\n#G..#E#\n#E#E.E#\n#G.##.#\n#...#E#\n#...E.#\n#######")
-
   ; 39514, 31284
   (def input "#######\n#E..EG#\n#.#G.E#\n#E.##E#\n#G..#.#\n#..E#.#\n#######")
-
   ; 27755, 3478
   (def input "#######\n#E.G#.#\n#.#G..#\n#G.#.G#\n#G..#.#\n#...E.#\n#######")
-
   ; 28944, 6474
   (def input "#######\n#.E...#\n#.#..G#\n#.###.#\n#E#G#G#\n#...#G#\n#######")
-
   ; 18740, 1140
   (def input "#########\n#G......#\n#.E.#...#\n#..##..G#\n#...##..#\n#...#...#\n#.G...G.#\n#.....G.#\n#########"))
 
 (def input (-> "day15.in" io/resource slurp))
 
-; part-1
-(-> (input->world input)
-    (finish-combat)
-    (outcome))
+(defn part1 [input]
+  (-> (input->world input)
+      (finish-combat)
+      (outcome)))
 
-; part-2
 (defn adjust-power [world power]
   (let [power-fn (fn [unit]
                    (let [p (if (= (:side unit) \E) power 3)]
                      (assoc unit :power p)))]
     (update world :units #(mapv power-fn %))))
 
-(let [world (input->world input)
-      loss? #(and (= (:side %) \E) ((complement alive?) %))]
-  (->> (drop 4 (range))
-       (map #(adjust-power world %))
-       (map finish-combat)
-       (drop-while #(some loss? (:units %)))
-       (first)
-       (outcome)))
+(defn no-loss? [world side]
+  (->> (:units world)
+       (filter #(= (:side %) side))
+       (every? alive?)))
 
-(defn print-world [{:keys [walls units round]}]
-  (let [max-y    (inc (apply max (map first walls)))
-        max-x    (inc (apply max (map second walls)))
+(defn part2 [input]
+  (let [world (input->world input)]
+    (->> (drop 4 (range))
+         (map #(adjust-power world %))
+         (map finish-combat)
+         (find-first #(no-loss? % \E))
+         (outcome))))
 
-        units    (filter alive? units)
+(defn print-world [{:keys [walls round] :as world}]
+  (let [[_ [max-y max-x]] (util/bounding-box (:walls world))
+        units    (alive-units world)
         yx->unit (reduce #(assoc %1 (:pos %2) %2) {} units)]
     (println "After" round "rounds:")
-    (doseq [y (range max-y)]
-      (doseq [x (range max-x)]
+    (doseq [y (util/range-incl max-y)]
+      (doseq [x (util/range-incl max-x)]
         (print (if (walls [y x])
                  \#
                  (or (get-in yx->unit [[y x] :side]) \.))))
