@@ -1,5 +1,5 @@
 (ns year2018.day24
-  (:require [util :refer [fixed-point]]
+  (:require [util :refer [rsort-by fixed-point find-first]]
             [clojure.string :as str]))
 
 (def input
@@ -57,7 +57,7 @@
   (* (:units group) (:attack group)))
 
 (defn selection-order [groups]
-  (sort-by (juxt effective-power :initiative) #(compare %2 %1) groups))
+  (rsort-by (juxt effective-power :initiative) groups))
 
 (defn damage [atk def]
   (let [deal (effective-power atk)
@@ -79,7 +79,7 @@
             target (->> (enemy-army groups attacker)
                         (filter (comp pos? :units))
                         (remove chosen)
-                        (sort-by (juxt #(damage attacker %) effective-power :initiative) #(compare %2 %1))
+                        (rsort-by (juxt #(damage attacker %) effective-power :initiative))
                         (first))]
         (if (and target (pos? (damage attacker target)))
           (assoc selection attacker target)
@@ -101,7 +101,7 @@
 
 (defn round [groups]
   (let [selection (selection groups)
-        order     (->> (sort-by (comp :initiative first) > selection)
+        order     (->> (rsort-by (comp :initiative first) selection)
                        (map (fn [[atk def]] [(index-of groups atk) (index-of groups def)])))]
     ; in decreasing initiative order
     (reduce
@@ -110,7 +110,6 @@
               def   (nth groups def-i)
               dealt (damage atk def)
               def'  (deal-damage def dealt)]
-          (println atk-i "->" def-i "damage:" dealt "killing:" (- (:units def) (:units def')))
           (assoc groups def-i def')))
       groups
       order)))
@@ -124,3 +123,12 @@
 ;part-1
 (let [groups (input->groups input)]
   (units-by-army (fixed-point round groups)))
+
+(defn boost-power [groups boost]
+  (mapv #(update % :attack + (if (= (:army %) :immune-system) boost 0)) groups))
+
+(let [groups (input->groups input)]
+  (->> (range)
+       (map #(boost-power groups %))
+       (map #(units-by-army (fixed-point round %)))
+       (find-first #(zero? (:infection %)))))

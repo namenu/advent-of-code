@@ -14,6 +14,9 @@
       nil
       result)))
 
+(defn rsort-by [keyfn coll]
+  (sort-by keyfn #(compare %2 %1) coll))
+
 (defn fixed-point [f x]
   (reduce #(if (= %1 %2) (reduced %1) %2)
           (iterate f x)))
