@@ -1,14 +1,9 @@
 (ns year2018.day06
-  (:require [util :refer [manhattan-dist]]))
+  (:require [util :refer [manhattan-dist bounding-box]]))
 
 (defn parse [s]
   (let [[_ x y] (re-find #"(\d+), (\d+)" s)]
     [(Integer/parseInt x) (Integer/parseInt y)]))
-
-(defn bounding-box [points]
-  (let [[min-x max-x] (apply (juxt min max) (map first points))
-        [min-y max-y] (apply (juxt min max) (map second points))]
-    [[min-x min-y] [max-x max-y]]))
 
 (defn closest-point [[x y] points]
   (let [[[c1 d1] [_ d2]] (->> points
