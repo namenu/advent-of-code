@@ -5,9 +5,6 @@
             [clojure.data.priority-map :refer [priority-map]]
             [util :refer [manhattan-dist range-incl bounding-box]]))
 
-(def input "pos=<0,0,0>, r=4\npos=<1,0,0>, r=1\npos=<4,0,0>, r=3\npos=<0,2,0>, r=1\npos=<0,5,0>, r=3\npos=<0,0,3>, r=1\npos=<1,1,1>, r=1\npos=<1,1,2>, r=1\npos=<1,3,1>, r=1\n")
-(def input "pos=<10,12,12>, r=2\npos=<12,14,12>, r=2\npos=<16,12,12>, r=4\npos=<14,14,14>, r=6\npos=<50,50,50>, r=200\npos=<10,10,10>, r=5")
-(def input (-> "day23.in" io/resource slurp))
 
 (s/def ::coord (s/tuple int? int? int?))
 (s/def ::pos ::coord)
@@ -59,8 +56,19 @@
       {:corner [x y z]
        :size   sz})))
 
+(defn power-of-two [n]
+  (letfn [(f [k]
+            (if (>= k n)
+              k
+              (f (* k 2))))]
+    (f 1)))
+
 (defn find-root [bots]
-  (let [r (bit-shift-left 1 27)]
+  (let [bbox (bounding-box (map :pos bots))
+        r    (->> (flatten bbox)
+                  (map #(Math/abs %))
+                  (apply max)
+                  (power-of-two))]
     {:corner [(- r) (- r) (- r)]
      :size   (* r 2)}))
 
@@ -83,9 +91,10 @@
                 items    (map vector children (map weight children))]
             (recur (into (pop queue) items))))))))
 
-(time
-  (part2 input))
-
 (comment
+  (def input (-> "day23.in" io/resource slurp))
+  (time (part1 input))
+  (time (part2 input))
+  
   (require '[clojure.spec.test.alpha :as stest])
   (stest/instrument))
