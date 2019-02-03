@@ -3,16 +3,19 @@
 (defn find-first [pred coll]
   (first (filter pred coll)))
 
-(defn first-duplicate-key [key-fn xs]
-  (let [result (reduce (fn [seen x]
-                         (let [k (key-fn x)]
-                           (if (seen k)
-                             (reduced x)
-                             (conj seen k))))
-                       #{} xs)]
-    (if (set? result)
-      nil
-      result)))
+(defn first-duplicate
+  ([xs]
+   (first-duplicate identity xs))
+  ([key-fn xs]
+   (let [result (reduce (fn [seen x]
+                          (let [k (key-fn x)]
+                            (if (seen k)
+                              (reduced x)
+                              (conj seen k))))
+                        #{} xs)]
+     (if (set? result)
+       nil
+       result))))
 
 (defn rsort-by [keyfn coll]
   (sort-by keyfn #(compare %2 %1) coll))

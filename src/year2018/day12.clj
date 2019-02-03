@@ -1,7 +1,7 @@
 (ns year2018.day12
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
-            [util :refer [first-duplicate-key]]))
+            [util :refer [first-duplicate]]))
 
 (def plant? #(= \# %))
 
@@ -53,7 +53,7 @@
 
 (defn part2 [input]
   (let [[init patterns] (parse-input input)
-        gen-repeating (first-duplicate-key
+        gen-repeating (first-duplicate
                         :pots
                         (take 200 (iterate (partial evolve patterns) init)))
         gen-50b       (-> gen-repeating

@@ -1,7 +1,7 @@
 (ns year2018.day13
   (:require [clojure.string :as str]
             [clojure.java.io :as io]
-            [util :refer [first-duplicate-key]]))
+            [util :refer [first-duplicate]]))
 
 (def cart-comp #(let [[x1 y1] (:pos %1)
                       [x2 y2] (:pos %2)]
@@ -84,7 +84,7 @@
       )))
 
 (defn collision [carts]
-  (if-let [cart (first-duplicate-key :pos carts)]
+  (if-let [cart (first-duplicate :pos carts)]
     (:pos cart)))
 
 (defn update-state [{:keys [track carts] :as state}]
