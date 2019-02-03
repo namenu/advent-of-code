@@ -1,0 +1,15 @@
+{
+  "name": "aoc-2017-reason",
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w"
+  },
+  "dependencies": {
+    "immutable": "^4.0.0-rc.12"
+  },
+  "devDependencies": {
+    "bs-platform": "^8.2.0",
+    "gentype": "^3.31.0"
+  }
+}
