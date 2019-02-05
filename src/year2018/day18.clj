@@ -1,9 +1,10 @@
 (ns year2018.day18
-  (:require [clojure.string :as str]
+  (:require [util :refer [find-cycle]]
+            [clojure.string :as str]
             [clojure.java.io :as io]))
 
 (def input (str/split-lines ".#.#...|#.\n.....#|##|\n.|..|...#.\n..|#.....#\n#.#|||#|#|\n...#.||...\n.|....|...\n||...#|.#|\n|.||||..|.\n...#.|..|."))
-(def input (->> (-> "day18.in" io/resource io/reader line-seq)))
+(def input (->> (-> "year2018/day18.in" io/resource io/reader line-seq)))
 
 (def state (->> (for [[y line] (map-indexed vector input)
                       [x c] (map-indexed vector line)]
@@ -62,16 +63,8 @@
 (resource-value state 10)
 
 
-(defn find-cycle [coll]
-  (loop [[c & rest] coll
-         seen {c 0}
-         nth  1]
-    (let [c' (first rest)]
-      (if-let [prev (seen c')]
-        [prev (- nth prev)]
-        (recur rest (assoc seen c' nth) (inc nth))))))
-
 ;part2
 (let [[n m] (find-cycle (iterate update-state state))
-      nth (+ n (mod (- 1000000000 n) m))]
+      len (- m n)
+      nth (+ n (mod (- 1000000000 n) len))]
   (resource-value state nth))

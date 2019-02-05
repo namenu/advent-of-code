@@ -30,7 +30,7 @@
         (recur (inc t) new-elves new-area)
         t))))
 
-(def input (->> "day10.in" io/resource io/reader line-seq))
+(def input (->> "year2018/day10.in" io/resource io/reader line-seq))
 (def elves (map ->elf input))
 
 ; part2 answer
@@ -84,7 +84,7 @@
       (q/point x y))))
 
 (comment
-  (def input (->> "day10.in" io/resource io/reader line-seq))
+  (def input (->> "year2018/day10.in" io/resource io/reader line-seq))
   (def elves (map ->elf input))
 
   (run-sketch)

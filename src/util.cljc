@@ -17,6 +17,17 @@
        nil
        result))))
 
+(defn find-cycle
+  "Also can be implemented through a combination of first-duplicate & find-first."
+  [coll]
+  (loop [[c & rest] coll
+         seen {c 0}
+         nth  1]
+    (let [c' (first rest)]
+      (if-let [prev (seen c')]
+        [prev nth]
+        (recur rest (assoc seen c' nth) (inc nth))))))
+
 (defn rsort-by [keyfn coll]
   (sort-by keyfn #(compare %2 %1) coll))
 

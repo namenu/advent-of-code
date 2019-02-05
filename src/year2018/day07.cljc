@@ -88,7 +88,7 @@
 
   (comment
     (require '[clojure.java.io :as io])
-    (let [input (->> "day07.in" io/resource io/reader line-seq)]))
+    (let [input (->> "year2018/day07.in" io/resource io/reader line-seq)]))
   )
 
 (run-tests)

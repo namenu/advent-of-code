@@ -46,5 +46,5 @@
 (def input4 "1,-1,-1,-2\n-2,-2,0,1\n0,2,1,3\n-2,3,-2,1\n0,2,3,-2\n-1,-1,1,-2\n0,-2,-1,0\n-2,2,3,-1\n1,2,2,0\n-1,-2,0,-2")
 
 ; part1
-(def input (-> "day25.in" io/resource slurp))
+(def input (-> "year2018/day25.in" io/resource slurp))
 (count (constellations (input->points input)))

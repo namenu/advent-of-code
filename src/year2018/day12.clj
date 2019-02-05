@@ -69,7 +69,7 @@
   (let [input "initial state: #..#.#..##......###...###\n\n...## => #\n..#.. => #\n.#... => #\n.#.#. => #\n.#.## => #\n.##.. => #\n.#### => #\n#.#.# => #\n#.### => #\n##.#. => #\n##.## => #\n###.. => #\n###.# => #\n####. => #"]
     (is (= 325 (time (part1 input)))))
 
-  (let [input (->> "day12.in" io/resource slurp)]
+  (let [input (->> "year2018/day12.in" io/resource slurp)]
     (is (= 2767 (time (part1 input))))
     (is (= 2650000001362 (time (part2 input))))))
 

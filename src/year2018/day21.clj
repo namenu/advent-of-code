@@ -4,7 +4,7 @@
             [year2018.device :refer :all]))
 
 
-(def input (->> (-> "day21.in" io/resource slurp)))
+(def input (->> (-> "year2018/day21.in" io/resource slurp)))
 
 (defn part1 []
   (loop [m (input->device input)]

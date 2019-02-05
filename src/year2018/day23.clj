@@ -92,7 +92,7 @@
             (recur (into (pop queue) items))))))))
 
 (comment
-  (def input (-> "day23.in" io/resource slurp))
+  (def input (-> "year2018/day23.in" io/resource slurp))
   (time (part1 input))
   (time (part2 input))
   

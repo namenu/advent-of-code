@@ -15,7 +15,7 @@
    (read-string (str "[" inst "]"))
    (device (read-string (subs after 8)))])
 
-(def samples (->> (-> "day16-1.in" io/resource io/reader line-seq)
+(def samples (->> (-> "year2018/day16-1.in" io/resource io/reader line-seq)
                   (remove #(zero? (count %)))
                   (partition 3)
                   (map parse-sample)))
@@ -46,7 +46,7 @@
         opcode-map
         (recur opcode-map to-find)))))
 
-(def instructions (->> (-> "day16-2.in" io/resource io/reader line-seq)
+(def instructions (->> (-> "year2018/day16-2.in" io/resource io/reader line-seq)
                        (map #(read-string (str "[" % "]")))))
 
 (defn part2 []

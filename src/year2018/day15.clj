@@ -142,7 +142,7 @@
   ; 18740, 1140
   (def input "#########\n#G......#\n#.E.#...#\n#..##..G#\n#...##..#\n#...#...#\n#.G...G.#\n#.....G.#\n#########"))
 
-(def input (-> "day15.in" io/resource slurp))
+(def input (-> "year2018/day15.in" io/resource slurp))
 
 (defn part1 [input]
   (-> (input->world input)

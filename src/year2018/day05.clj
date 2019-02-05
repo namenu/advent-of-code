@@ -56,7 +56,7 @@
     (is (= 10 (part1 input)))
     (is (= 4 (part2 input))))
 
-  (let [input (->> "day05.in" io/resource io/reader slurp)]
+  (let [input (->> "year2018/day05.in" io/resource io/reader slurp)]
     (is (= 11310 (part1 input)))
     (is (= 6020 (part2 input)))))
 

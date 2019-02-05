@@ -6,7 +6,7 @@
 
 
 (def input "#ip 0\nseti 5 0 1\nseti 6 0 2\naddi 0 1 0\naddr 1 2 3\nsetr 1 0 0\nseti 8 0 4\nseti 9 0 5")
-(def input (->> (-> "day19.in" io/resource slurp)))
+(def input (->> (-> "year2018/day19.in" io/resource slurp)))
 
 ;part1
 (-> (fixed-point exec (input->device input))

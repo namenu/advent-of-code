@@ -3,7 +3,7 @@
             [clojure.java.io :as io]))
 
 (def input (str/split-lines "x=495, y=2..7\ny=7, x=495..501\nx=501, y=3..7\nx=498, y=2..4\nx=506, y=1..2\nx=498, y=10..13\nx=504, y=10..13\ny=13, x=498..504"))
-(def input (->> (-> "day17.in" io/resource io/reader line-seq)))
+(def input (->> (-> "year2018/day17.in" io/resource io/reader line-seq)))
 
 (defn parse-line [s]
   (let [[_ axis v _ begin end] (re-find #"(\w)=(\d+), (\w)=(\d+)\.\.(\d+)" s)

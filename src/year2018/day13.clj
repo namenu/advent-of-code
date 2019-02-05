@@ -128,7 +128,7 @@
 (defn print-carts [{:keys [carts]}]
   (map #(dissoc % :opt) carts))
 
-(def input (->> "day13.in" io/resource slurp))
+(def input (->> "year2018/day13.in" io/resource slurp))
 
 (comment
 

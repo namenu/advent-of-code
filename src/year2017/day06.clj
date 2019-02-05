@@ -1,6 +1,6 @@
 ;; --- Day 6: Memory Reallocation ---
 (ns year2017.day06
-  (:require [util :refer [find-first first-duplicate]]))
+  (:require [util :refer [find-cycle]]))
 
 (def banks [0 2 7 0])
 (def banks [5 1 10 0 1 7 13 14 3 12 8 10 7 12 0 6])
@@ -12,15 +12,12 @@
 
 (defn spread [banks]
   (let [[i blocks] (max-bank banks)
-        iterator (cycle (range (count banks)))]
-    (reduce
-      #(update %1 %2 inc)
-      (assoc banks i 0)
-      (take blocks (drop (inc i) iterator)))))
+        iterator (->> (cycle (range (count banks)))
+                      (drop (inc i))
+                      (take blocks))]
+    (reduce #(update %1 %2 inc)
+            (assoc banks i 0)
+            iterator)))
 
-(let [indexed-cycles (->> (iterate spread banks)
-                          (map-indexed vector))
-      [index pattern] (->> indexed-cycles
-                           (first-duplicate second))
-      [first-seen _] (find-first #(= (second %) pattern) indexed-cycles)]
-  [index, (- index first-seen)])
+(let [[i j] (find-cycle (iterate spread banks))]
+  [j (- j i)])

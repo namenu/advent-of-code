@@ -62,7 +62,7 @@
 (def regex "^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$")
 (def regex "^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$")
 (def regex "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$")
-(def regex (-> "day20.in" io/resource slurp str/trim))
+(def regex (-> "year2018/day20.in" io/resource slurp str/trim))
 
 (def facility
   (first (traverse [{} [[0 0]]] (regex->edn regex))))
