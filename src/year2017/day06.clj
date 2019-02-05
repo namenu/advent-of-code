@@ -12,17 +12,11 @@
 
 (defn spread [banks]
   (let [[i blocks] (max-bank banks)
-        next #(mod (inc %) (count banks))]
-    (loop [banks  (assoc banks i 0)
-           i      (next i)
-           blocks blocks]
-      (if (zero? blocks)
-        banks
-
-        (recur (update banks i inc)
-               (next i)
-               (dec blocks))))))
-
+        iterator (cycle (range (count banks)))]
+    (reduce
+      #(update %1 %2 inc)
+      (assoc banks i 0)
+      (take blocks (drop (inc i) iterator)))))
 
 (let [indexed-cycles (->> (iterate spread banks)
                           (map-indexed vector))
