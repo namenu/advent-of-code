@@ -1,4 +1,4 @@
-;; --- Day 3: Spiral Memory ---
+;; --- Day 4: High-Entropy Passphrases ---
 (ns year2017.day04
   (:require [util :refer [first-duplicate]]
             [clojure.string :as str]
