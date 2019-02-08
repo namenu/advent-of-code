@@ -28,6 +28,17 @@
         [prev nth]
         (recur rest (assoc seen c' nth) (inc nth))))))
 
+(defn unique-one
+  ([xs]
+   (unique-one identity xs))
+  ([key-fn [x y & xs]]
+   (when xs
+     (let [a (key-fn x), b (key-fn y)]
+       (if (= a b)
+         (find-first #(not= (key-fn %) a) xs)
+         (let [z (first xs), c (key-fn z)]
+           (if (= a c) y x)))))))
+
 (defn rsort-by [keyfn coll]
   (sort-by keyfn #(compare %2 %1) coll))
 
