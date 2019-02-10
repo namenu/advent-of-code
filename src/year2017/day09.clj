@@ -3,91 +3,62 @@
   (:require [clojure.string :as str]
             [clojure.java.io :as io]))
 
-(defn stream->score [stream]
-  (loop [[c & s] stream
-         depth 0
-         mode  :stream
-         [score garbage] [0 0]]
+(def init-state
+  {:depth   0
+   :mode    :stream
+   :score   0
+   :garbage 0})
 
-    (if (nil? c)
-      [score garbage]
+(defn transit [state c]
+  (case (:mode state)
+    :stream
+    (case c
+      \{ (update state :depth inc)
+      \} (-> state
+             (update :depth dec)
+             (update :score + (:depth state)))
+      \, state
+      \< (assoc state :mode :garbage))
 
-      (case mode
-        :stream (case c
-                  \{
-                  (recur s
-                         (inc depth)
-                         mode
-                         [score garbage])
+    :garbage
+    (case c
+      \> (assoc state :mode :stream)
+      \! (assoc state :mode :ignore)
+      (update state :garbage inc))
 
-                  \}
-                  (recur s
-                         (dec depth)
-                         mode
-                         [(+ score depth) garbage])
+    :ignore
+    (assoc state :mode :garbage)))
 
-                  \,
-                  (recur s
-                         depth
-                         mode
-                         [score garbage])
+(defn process-stream [stream]
+  (reduce transit init-state stream))
 
-                  \<
-                  (recur s
-                         depth
-                         :garbage
-                         [score garbage]))
-
-        :garbage (case c
-                   \>
-                   (recur s
-                          depth
-                          :stream
-                          [score garbage])
-
-                   \!
-                   (recur s
-                          depth
-                          :ignore
-                          [score garbage])
-
-                   (recur s
-                          depth
-                          mode
-                          [score (inc garbage)]))
-
-        :ignore (case c
-                  (recur s
-                         depth
-                         :garbage
-                         [score garbage])
-                  )
-        )
-      )))
-
-(let [input (->> "year2017/day09.in" io/resource io/reader slurp str/trim)]
-  (stream->score input))
+(let [input (->> "year2017/day09.in" io/resource slurp str/trim)]
+  (process-stream input))
 
 
 ;; tests
-(require '[clojure.test :refer [deftest is run-tests]])
+(require '[clojure.test :refer [deftest testing is are run-tests]])
 
 (deftest test
-  (is (= 1 (first (stream->score "{}"))))
-  (is (= 6 (first (stream->score "{{{}}}"))))
-  (is (= 5 (first (stream->score "{{},{}}"))))
-  (is (= 16 (first (stream->score "{{{},{},{{}}}}"))))
-  (is (= 1 (first (stream->score "{<a>,<a>,<a>,<a>}"))))
-  (is (= 9 (first (stream->score "{{<ab>},{<ab>},{<ab>},{<ab>}}"))))
-  (is (= 9 (first (stream->score "{{<!!>},{<!!>},{<!!>},{<!!>}}"))))
-  (is (= 3 (first (stream->score "{{<a!>},{<a!>},{<a!>},{<ab>}}"))))
+  (testing "pt.1"
+    (are [expected actual] (= expected (:score actual))
+      1 (process-stream "{}")
+      6 (process-stream "{{{}}}")
+      5 (process-stream "{{},{}}")
+      16 (process-stream "{{{},{},{{}}}}")
+      1 (process-stream "{<a>,<a>,<a>,<a>}")
+      9 (process-stream "{{<ab>},{<ab>},{<ab>},{<ab>}}")
+      9 (process-stream "{{<!!>},{<!!>},{<!!>},{<!!>}}")
+      3 (process-stream "{{<a!>},{<a!>},{<a!>},{<ab>}}")))
 
-  (is (= 0 (second (stream->score "<>"))))
-  (is (= 17 (second (stream->score "<random characters>"))))
-  (is (= 3 (second (stream->score "<<<<>"))))
-  (is (= 2 (second (stream->score "<{!>}>"))))
-  (is (= 0 (second (stream->score "<!!>"))))
-  (is (= 0 (second (stream->score "<!!!>>"))))
-  (is (= 10 (second (stream->score "<{o\"i!a,<{i<a>")))))
+  (testing "pt.2"
+    (are [expected actual] (= expected (:garbage actual))
+      0 (process-stream "<>")
+      17 (process-stream "<random characters>")
+      3 (process-stream "<<<<>")
+      2 (process-stream "<{!>}>")
+      0 (process-stream "<!!>")
+      0 (process-stream "<!!!>>")
+      10 (process-stream "<{o\"i!a,<{i<a>"))))
 
 (run-tests)
