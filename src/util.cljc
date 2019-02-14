@@ -3,6 +3,11 @@
 (defn find-first [pred coll]
   (first (filter pred coll)))
 
+(defn find-first-index [pred coll]
+  (->> (map-indexed vector coll)
+       (find-first (comp pred second))
+       (first)))
+
 (defn first-duplicate
   ([xs]
    (first-duplicate identity xs))
