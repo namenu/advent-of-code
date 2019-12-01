@@ -16,15 +16,15 @@
       (+ mm (mass->fuel2 mm))
       0)))
 
-(mass->fuel 1969)
-
+; pt.1
 (apply + (map mass->fuel input))
 
+; pt.2
 (apply + (map mass->fuel2 input))
 
 
 ;;
-; numerical solution
+; numerical-analytical solution
 ;
 ; m은 등비수열 A(k,n)으로 표현할 수 있음
 ; 0보다 큰 m 에 대해,
@@ -36,55 +36,61 @@
 ;  - m := f(m)
 ; 이 떄, S(k,n)은 등비수열의 합
 
-(defn threes [m]
-  (if (zero? (rem m 3))
-    (inc (threes (quot m 3)))
-    0))
-
 (defn kn [m]
-  (let [m' (+ m 3)
-        n' (threes m')
-        k  (quot m' (math/expt 3 n'))]
-    [k (inc n')]))
+  (loop [m (+ m 3) cnt 1]
+    (let [r (rem m 3)]
+      (if (zero? r)
+        (recur (quot m 3) (inc cnt))
+        [m cnt]))))
 
 ; An = k*3^(n-1) - 3
+; (for test)
 (defn A [k n]
   (- (* k (math/expt 3 (dec n))) 3))
 
-; Sn = k/2*3^(n-1) - 3n, S1 >= 0
-(defn S [k n]
-  (-> (math/expt 3 n)
-      (- 1)
-      (* k)
-      (quot 2)
-      (- (* 3 n))))
+; Sn = k/2*(3^n-1) - 3n, S1 >= 0
+;    = (3*An+9-k-6n) / 2
+(defn S [m k n]
+  (-> (* m 3)
+      (+ 9)
+      (- k)
+      (- (* 6 n))
+      (quot 2)))
 
-(defn f [m]
-  (- (quot m 3) 2))
+(def f mass->fuel)
 
 (defn F [m]
-  (if (pos? m)
-    (if (zero? (rem m 3))
-      (let [[k n] (kn m)]
-        (if (>= k 3)
-          (+ (S k n) (F (f (A k 1))))
-          (+ m (F (f m)))))
-      (+ m (F (f m))))
-    0))
+  (let [m (f m)]
+    (if (pos? m)
+      (if (zero? (rem m 3))
+        (let [[k n] (kn m)]
+          (if (>= k 3)
+            (+ (S m k n) (F (- k 3)))
+            (+ m (F m))))
+        (+ m (F m)))
+      0)))
 
-(def mass->fuel2' #(F (f %)))
+(def mass->fuel2' F)
 
 (comment
   "ensure both solutions give the same answers."
   (filter (comp false? second)
           (for [i (range 10000)]
-            [i (= (mass->fuel2 i) (mass->fuel2' i))])))
+            [i (= (mass->fuel2 i) (mass->fuel2' i))]))
 
-(let [input input]
-  [(time (apply + (map mass->fuel2 input)))
-   (time (apply + (map mass->fuel2' input)))])
+  (time (count (for [i (range 1000000)] (mass->fuel2 i))))
+  (time (count (for [i (range 1000000)] (mass->fuel2' i))))
 
-;; :(
-(let [m (A 123456789 10000)]
-  (time (mass->fuel2 m))
-  (time (mass->fuel2' m)))
+  (let [input input]
+    [(time (apply + (map mass->fuel2 input)))
+     (time (apply + (map mass->fuel2' input)))])
+
+  ; 4931831
+  (apply + (map mass->fuel2' input))
+
+  ;; the analytical solution is much slower.. :(
+  (let [m (A 123456789 1000)]
+    (time (mass->fuel2 m))
+    (time (mass->fuel2' m)))
+  )
+
