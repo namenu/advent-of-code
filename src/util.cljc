@@ -1,4 +1,11 @@
-(ns util)
+(ns util
+  (:require [clojure.java.io :as io]))
+
+(defn input [year day]
+  #?(:clj (-> (format "year%d/day%02d.in" year day) io/resource slurp)))
+
+(defn input-lines [year day]
+  #?(:clj (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq)))
 
 (defn find-first [pred coll]
   (first (filter pred coll)))

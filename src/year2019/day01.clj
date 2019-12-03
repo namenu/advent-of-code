@@ -1,3 +1,4 @@
+;; --- Day 1: The Tyranny of the Rocket Equation ---
 (ns year2019.day01
   (:require [clojure.java.io :as io]
             [clojure.math.numeric-tower :as math]))
