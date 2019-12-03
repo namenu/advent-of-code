@@ -21,13 +21,13 @@
 (defn move-segment [pos [dir scalar]]
   (drop 1 (reductions move pos (repeat scalar dir))))
 
-(defn wire->trail [start_pos wire]
+(defn wire->trail [start-pos wire]
   (let [segments (parse-wire wire)]
     (reduce (fn [coords segment]
               (let [tip   (last coords)
                     trail (move-segment tip segment)]
                 (into coords trail)))
-            [start_pos]
+            [start-pos]
             segments)))
 
 (def start-pos [0 0])
@@ -36,12 +36,12 @@
   (move-segment start-pos [:up 3])
 
   (let [[wire1 wire2] (input-lines 2019 3)
-        [t1 t2] (map (partial wire->trail start-pos) [wire1 wire2])
-        [d1 d2] (map #(into {} (map vector % (range))) [t1 t2])
+        [t1 t2] [(wire->trail start-pos wire1) (wire->trail start-pos wire2)]
         crosses (disj (set/intersection (set t1) (set t2)) start-pos)]
     ; pt.1
     (apply min (map #(apply manhattan-dist [start-pos %]) crosses))
 
     ; pt.2
-    (apply min (map #(+ (d1 %) (d2 %)) crosses)))
+    (let [[d1 d2] (map #(into {} (map vector % (range))) [t1 t2])]
+      (apply min (map #(+ (d1 %) (d2 %)) crosses))))
   )

@@ -1,27 +1,26 @@
 ;; --- Day 1: The Tyranny of the Rocket Equation ---
 (ns year2019.day01
-  (:require [clojure.java.io :as io]
+  (:require [util :refer [input-lines]]
             [clojure.math.numeric-tower :as math]))
 
 (set! *unchecked-math* true)
 
-(def input (let [lines (-> "year2019/day01.in" io/resource io/reader line-seq)]
-             (map #(Integer/parseInt %) lines)))
+(def input (map #(Integer/parseInt %) (input-lines 2019 1)))
 
 (defn mass->fuel [m]
   (- (quot m 3) 2))
 
-(defn mass->fuel2 [m]
-  (let [mm (mass->fuel m)]
-    (if (pos? mm)
-      (+ mm (mass->fuel2 mm))
-      0)))
+(defn mass->fuel* [m]
+  (->> (iterate mass->fuel m)
+       (take-while pos?)
+       (drop 1)
+       (apply +)))
 
 ; pt.1
 (apply + (map mass->fuel input))
 
 ; pt.2
-(apply + (map mass->fuel2 input))
+(apply + (map mass->fuel* input))
 
 
 ;;
@@ -71,27 +70,26 @@
         (+ m (F m)))
       0)))
 
-(def mass->fuel2' F)
+(def mass->fuel*' F)
 
 (comment
   "ensure both solutions give the same answers."
   (filter (comp false? second)
           (for [i (range 10000)]
-            [i (= (mass->fuel2 i) (mass->fuel2' i))]))
+            [i (= (mass->fuel* i) (mass->fuel*' i))]))
 
-  (time (count (for [i (range 1000000)] (mass->fuel2 i))))
-  (time (count (for [i (range 1000000)] (mass->fuel2' i))))
+  (time (count (for [i (range 1000000)] (mass->fuel* i))))
+  (time (count (for [i (range 1000000)] (mass->fuel*' i))))
 
   (let [input input]
-    [(time (apply + (map mass->fuel2 input)))
-     (time (apply + (map mass->fuel2' input)))])
+    [(time (apply + (map mass->fuel* input)))
+     (time (apply + (map mass->fuel*' input)))])
 
   ; 4931831
-  (apply + (map mass->fuel2' input))
+  (apply + (map mass->fuel*' input))
 
   ;; the analytical solution is much slower.. :(
   (let [m (A 123456789 1000)]
-    (time (mass->fuel2 m))
-    (time (mass->fuel2' m)))
+    (time (mass->fuel* m))
+    (time (mass->fuel*' m)))
   )
-
