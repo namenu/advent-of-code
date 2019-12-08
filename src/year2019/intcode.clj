@@ -1,17 +1,24 @@
 (ns year2019.intcode
-  (:require [util :refer [find-first]]))
+  (:require [util :refer [find-first]])
+  (:import (clojure.lang PersistentQueue)))
 
 (defn ->machine [program]
   {:program program
    :ip      0
-   :input   []
+   :input   PersistentQueue/EMPTY
    :output  []})
 
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
 
-(defn store [program addr value]
-  (assoc program addr value))
+(defn add-input [state value]
+  (update state :input conj value))
+
+(defn load-input [state addr]
+  (let [val (peek (:input state))]
+    (-> state
+        (update :input pop)
+        (update :program assoc addr val))))
 
 (defn jump-if [state pred p1 p2]
   (cond-> state
@@ -52,11 +59,10 @@
       ; mult (4)
       2 (update state :program binary-op * (mparams 0) (mparams 1) (params 2))
 
-      ; read (2)
-      3 (let [in *input*]
-          (update state :program store (params 0) in))
+      ; input (2)
+      3 (load-input state (params 0))
 
-      ; print (2)
+      ; output (2)
       4 (let [output (mparams 0)]
           (update state :output conj output))
 
@@ -84,7 +90,7 @@
        (find-first halted?)))
 
 (comment
-  (binding [*input* 8]
-    (let [program [3, 3, 1108, -1, 8, 3, 4, 3, 99]
-          state   (run* (->machine program))]
-      state)))
+  (let [program [3, 3, 1108, -1, 8, 3, 4, 3, 99]]
+    (-> (->machine program)
+        (add-input 8)
+        (run*))))
