@@ -12,18 +12,19 @@
 (defn make-amp [program phase]
   (add-input (->machine program) phase))
 
-(defn amplify [program phases]
-  (loop [[p & ps] phases
+(defn amplify [amps]
+  (loop [[amp & amps] amps
          input 0]
-    (if p
-      (let [init   (add-input (make-amp program p) input)
+    (if amp
+      (let [init   (add-input amp input)
             output (-> (run* init) :output peek)]
-        (recur ps output))
+        (recur amps output))
       input)))
 
 (defn max-thruster [program amplifier phases]
-  (->> (for [phases (combo/permutations phases)]
-         (amplifier program phases))
+  (->> (for [phases (combo/permutations phases)
+             :let [amps (mapv make-amp (repeat 5 program) phases)]]
+         (amplifier amps))
        (apply max,,,)))
 
 (defn get-output [state]
@@ -31,8 +32,8 @@
     (->> (iterate run state)
          (find-first #(or (> (count (:output %)) output-cnt) (halted? %))))))
 
-(defn amplify-fb [program phases]
-  (loop [amps  (mapv make-amp (repeat 5 program) phases)
+(defn amplify-fb [amps]
+  (loop [amps  amps
          idx   0
          input 0]
     (let [before (add-input (get amps idx) input)

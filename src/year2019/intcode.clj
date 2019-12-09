@@ -1,12 +1,19 @@
 (ns year2019.intcode
-  (:require [util :refer [find-first]])
+  (:require [util :refer [find-first]]
+            [clojure.string :as str])
   (:import (clojure.lang PersistentQueue)))
 
 (defn ->machine [program]
-  {:program program
+  {:program (into {} (map-indexed vector program))
    :ip      0
+   :base    0
    :input   PersistentQueue/EMPTY
    :output  []})
+
+(defn input->state [input]
+  (let [numbers (-> input str/trim (str/split #","))
+        program (mapv #(Integer/parseInt %) numbers)]
+    (->machine program)))
 
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
@@ -28,8 +35,6 @@
 
 (def equals #(if (= %1 %2) 1 0))
 
-(def ^:dynamic *input* 1)
-
 (defn decode [v]
   (let [opcode (rem v 100)
         m      (quot v 100)
@@ -37,60 +42,57 @@
     [opcode modes]))
 
 (defn inst-size [opcode]
-  ({1 4, 2 4, 3 2, 4 2, 5 3, 6 3, 7 4, 8 4, 99 1} opcode))
+  ({1 4, 2 4, 3 2, 4 2, 5 3, 6 3, 7 4, 8 4, 9 2, 99 1} opcode))
 
-(defn get-param [program param mode]
-  (if (zero? mode)
-    (get program param)
-    param))
-
-(defn run [{:keys [program ip] :as state0}]
+(defn run [{:keys [program base ip] :as state0}]
   (let [[opcode modes] (decode (get program ip))
-        params  (subvec program (+ ip 1) (+ ip (inst-size opcode)))
-        mparams (mapv #(get-param program %1 %2) params modes)
-
+        params (mapv program (range (+ ip 1) (+ ip (inst-size opcode))))
+        p-in   (fn [p]
+                 (let [read #(or (get program %) 0)]
+                   (case (modes p)
+                     0 (read (params p))
+                     1 (params p)
+                     2 (read (+ (params p) base)))))
+        p-out  (fn [p]
+                 (if (= 2 (modes p))
+                   (+ (params p) base)
+                   (params p)))
         ; move ip first
-        state   (update state0 :ip + (inst-size opcode))
+        state  (update state0 :ip + (inst-size opcode))
         ]
     (case opcode
       ; add (4)
-      1 (update state :program binary-op + (mparams 0) (mparams 1) (params 2))
+      1 (update state :program binary-op + (p-in 0) (p-in 1) (p-out 2))
 
       ; mult (4)
-      2 (update state :program binary-op * (mparams 0) (mparams 1) (params 2))
+      2 (update state :program binary-op * (p-in 0) (p-in 1) (p-out 2))
 
       ; input (2)
-      3 (load-input state (params 0))
+      3 (load-input state (p-out 0))
 
       ; output (2)
-      4 (let [output (mparams 0)]
+      4 (let [output (p-in 0)]
           (update state :output conj output))
 
       ; jump-if-true (3)
-      5 (jump-if state (complement zero?) (mparams 0) (mparams 1))
+      5 (jump-if state (complement zero?) (p-in 0) (p-in 1))
 
       ; jump-if-false (3)
-      6 (jump-if state zero? (mparams 0) (mparams 1))
+      6 (jump-if state zero? (p-in 0) (p-in 1))
 
       ; less-than (4)
-      7 (update state :program binary-op less-than (mparams 0) (mparams 1) (params 2))
+      7 (update state :program binary-op less-than (p-in 0) (p-in 1) (p-out 2))
 
       ; equals (4)
-      8 (update state :program binary-op equals (mparams 0) (mparams 1) (params 2))
+      8 (update state :program binary-op equals (p-in 0) (p-in 1) (p-out 2))
 
-      99 (do
-           (prn "HALT")
-           (assoc state :halt true)))))
+      ; adjust-base (2)
+      9 (update state :base + (p-in 0))
 
-(defn halted? [{:keys [program ip]}]
-  (= 99 (get program ip)))
+      99 (assoc state :halt true))))
+
+(def halted? :halt)
 
 (defn run* [state0]
   (->> (iterate run state0)
        (find-first halted?)))
-
-(comment
-  (let [program [3, 3, 1108, -1, 8, 3, 4, 3, 99]]
-    (-> (->machine program)
-        (add-input 8)
-        (run*))))
