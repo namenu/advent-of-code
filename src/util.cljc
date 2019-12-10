@@ -73,3 +73,6 @@
 
 (defn manhattan-dist [a b]
   (reduce + (map #(Math/abs ^Integer (- %1 %2)) a b)))
+
+(defn cart->polar [[x y]]
+  [(Math/sqrt (+ (* x x) (* y y))) (Math/atan2 y x)])
