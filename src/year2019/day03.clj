@@ -24,7 +24,7 @@
 (defn wire->trail [start-pos wire]
   (let [segments (parse-wire wire)]
     (reduce (fn [coords segment]
-              (let [tip   (last coords)
+              (let [tip   (peek coords)
                     trail (move-segment tip segment)]
                 (into coords trail)))
             [start-pos]
