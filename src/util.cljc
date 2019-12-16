@@ -1,8 +1,9 @@
 (ns util
-  (:require [clojure.java.io :as io]))
+  (:require [clojure.java.io :as io]
+            [clojure.string :as str]))
 
 (defn input [year day]
-  #?(:clj (-> (format "year%d/day%02d.in" year day) io/resource slurp)))
+  #?(:clj (-> (format "year%d/day%02d.in" year day) io/resource slurp str/trim)))
 
 (defn input-lines [year day]
   #?(:clj (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq)))
