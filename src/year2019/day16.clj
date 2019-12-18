@@ -1,11 +1,11 @@
-;; --- Day 15: Oxygen System ---
+;; --- Day 16: Flawed Frequency Transmission ---
 (ns year2019.day16
   (:require [util :refer [input find-first bounding-box range-incl]]
             [graph :refer [bfs]]
             [year2019.intcode :refer :all]))
 
 (defn pattern [phase]
-  (->> (mapcat #(repeat phase %) [0 1 0 2])
+  (->> (mapcat #(repeat phase %) [0 1 0 -1])
        (cycle)
        (rest)))
 

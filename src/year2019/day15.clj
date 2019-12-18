@@ -2,6 +2,7 @@
 (ns year2019.day15
   (:require [util :refer [input find-first bounding-box range-incl]]
             [graph :refer [bfs]]
+            [grid :refer [print-grid]]
             [year2019.intcode :refer :all]))
 
 (def dirs {1 [0 1]
@@ -42,17 +43,6 @@
                 (recur ds droid'' grid''))))))
       grid)))
 
-(defn render-grid [grid]
-  (let [[[min-x min-y] [max-x max-y]] (bounding-box (keys grid))]
-    (doseq [y (range-incl min-y max-y)]
-      (let [s (map (fn [x]
-                     (case (get grid [x y] 0)
-                       0 "◾️"
-                       1 "▫️️️️"
-                       2 "⭐️"))
-                   (range-incl min-x max-x))]
-        (println (apply str s))))))
-
 (let [droid       (input->state (input 2019 15))
       init-grid   {[0 0] 1}
       start-pos   [0 0]
@@ -61,7 +51,8 @@
                     (->> (map #(move pos %) [1 2 3 4])
                          (remove #(zero? (grid %)))))]
 
-  (render-grid grid)
+  (let [decoder #(get {1 "▫️️️️" 2 "⭐️"} % "◾️")]
+    (print-grid grid decoder))
 
   (let [station-pos [18 18]]
     ; pt.1

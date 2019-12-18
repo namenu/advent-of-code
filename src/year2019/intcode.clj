@@ -12,7 +12,7 @@
 
 (defn input->state [input]
   (let [numbers (-> input str/trim (str/split #","))
-        program (mapv #(Integer/parseInt %) numbers)]
+        program (mapv #(Long/parseLong %) numbers)]
     (->machine program)))
 
 (defn binary-op [program op i1 i2 o]
@@ -22,14 +22,24 @@
   (update state :input conj value))
 
 (defn load-input [state addr]
-  (let [val (peek (:input state))]
-    (-> state
-        (update :input pop)
-        (update :program assoc addr val))))
+  (if-let [f (:input-fn state)]
+    (let [val (f)]
+      (-> state
+          (update :program assoc addr val)))
+
+    (let [val (peek (:input state))]
+      (-> state
+          (update :input pop)
+          (update :program assoc addr val)))))
+
+(defn print-output [state output]
+  (if-let [f (:output-fn state)]
+    (do (f output) state)
+    (update state :output conj output)))
 
 (defn jump-if [state pred p1 p2]
   (cond-> state
-          (pred p1) (assoc :ip p2)))
+    (pred p1) (assoc :ip p2)))
 
 (def less-than #(if (< %1 %2) 1 0))
 
@@ -71,8 +81,7 @@
       3 (load-input state (p-out 0))
 
       ; output (2)
-      4 (let [output (p-in 0)]
-          (update state :output conj output))
+      4 (print-output state (p-in 0))
 
       ; jump-if-true (3)
       5 (jump-if state (complement zero?) (p-in 0) (p-in 1))

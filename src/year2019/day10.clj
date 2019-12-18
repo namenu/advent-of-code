@@ -1,6 +1,7 @@
 ;; --- Day 10: Monitoring Station ---
 (ns year2019.day10
   (:require [util :refer [input cart->polar]]
+            [grid :refer [parse-grid]]
             [year2019.intcode :refer :all]
             [clojure.string :as str]))
 
@@ -20,13 +21,6 @@
           (recur (next targets) hits)
           (recur (next targets) (conj hits [dx dy]))))
       hits)))
-
-(defn parse-grid [input]
-  (->> (str/split-lines input)
-       (mapcat (fn [y line]
-                 (map-indexed (fn [x v] [[x y] v]) line))
-               (range))
-       (into {})))
 
 (defn best-monitoring [asteroids]
   (->> asteroids
