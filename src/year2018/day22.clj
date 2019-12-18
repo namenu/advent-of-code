@@ -1,6 +1,6 @@
 (ns year2018.day22
   (:require [util :refer [range-incl manhattan-dist]]
-            [graph :refer [A*]]))
+            [graph :refer [simple-A*]]))
 
 
 ;(def depth 510)
@@ -88,7 +88,7 @@
 
 (defn part2 []
   (let [init  {:pos [0 0], :equip :torch}
-        reach (A* init neighbors promising?)]
+        reach (simple-A* init neighbors promising?)]
     (->> reach
          (filter #(= (:pos (first %)) target))
          (apply min-key second))))
