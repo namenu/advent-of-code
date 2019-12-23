@@ -8,7 +8,8 @@
    :ip      0
    :base    0
    :input   PersistentQueue/EMPTY
-   :output  []})
+   :output  []
+   :status  :running})
 
 (defn input->state [input]
   (let [numbers (-> input str/trim (str/split #","))
@@ -20,6 +21,10 @@
 
 (defn add-input [state value]
   (update state :input conj value))
+
+; doesn't work for :input-fn mode
+(defn has-input? [state]
+  (some? (peek (:input state))))
 
 (defn load-input [state addr]
   (if-let [f (:input-fn state)]
@@ -39,7 +44,7 @@
 
 (defn jump-if [state pred p1 p2]
   (cond-> state
-    (pred p1) (assoc :ip p2)))
+          (pred p1) (assoc :ip p2)))
 
 (def less-than #(if (< %1 %2) 1 0))
 
@@ -78,7 +83,10 @@
       2 (update state :program binary-op * (p-in 0) (p-in 1) (p-out 2))
 
       ; input (2)
-      3 (load-input state (p-out 0))
+      3 (if (has-input? state)
+          (-> (load-input state (p-out 0))
+              (assoc :status :running))
+          (assoc state0 :status :pause))
 
       ; output (2)
       4 (print-output state (p-in 0))
@@ -98,10 +106,13 @@
       ; adjust-base (2)
       9 (update state :base + (p-in 0))
 
-      99 (assoc state :halt true))))
+      99 (assoc state :status :halt))))
 
-(def halted? :halt)
+(defn halted? [state] (= :halt (:status state)))
+(defn running? [state] (= :running (:status state)))
 
 (defn run* [state0]
   (->> (iterate run state0)
-       (find-first halted?)))
+       (next)
+       (drop-while running?)
+       (first)))
