@@ -1,5 +1,5 @@
 (ns year2018.day18
-  (:require [util :refer [find-cycle]]
+  (:require [util :refer [first-duplicate-index]]
             [clojure.string :as str]
             [clojure.java.io :as io]))
 
@@ -64,7 +64,7 @@
 
 
 ;part2
-(let [[n m] (find-cycle (iterate update-state state))
+(let [[n m] (first-duplicate-index (iterate update-state state))
       len (- m n)
       nth (+ n (mod (- 1000000000 n) len))]
   (resource-value state nth))

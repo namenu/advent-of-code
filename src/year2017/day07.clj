@@ -42,6 +42,14 @@
   (let [t (towers name)]
     (apply + (:weight t) (map #(tower-weight % towers) (:holdings t)))))
 
+(defn unique-one [key-fn [x y & xs]]
+  (when xs
+    (let [a (key-fn x), b (key-fn y)]
+      (if (= a b)
+        (find-first #(not= (key-fn %) a) xs)
+        (let [z (first xs), c (key-fn z)]
+          (if (= a c) y x))))))
+
 (defn find-unbalanced [name towers]
   (if-let [u (unique-one #(tower-weight % towers) (:holdings (towers name)))]
     (recur u towers)

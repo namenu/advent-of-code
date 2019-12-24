@@ -30,27 +30,20 @@
        nil
        result))))
 
-(defn find-cycle
-  "Also can be implemented through a combination of first-duplicate & find-first."
+(defn first-duplicate-index
+  "Returns the first cycle found as `[start end]`. (length = end - start + 1)
+  Also can be implemented through a combination of first-duplicate & find-first."
   [coll]
   (loop [[c & rest] coll
          seen {c 0}
          nth  1]
-    (let [c' (first rest)]
+    (if-let [c' (first rest)]
       (if-let [prev (seen c')]
         [prev nth]
         (recur rest (assoc seen c' nth) (inc nth))))))
 
-(defn unique-one
-  ([xs]
-   (unique-one identity xs))
-  ([key-fn [x y & xs]]
-   (when xs
-     (let [a (key-fn x), b (key-fn y)]
-       (if (= a b)
-         (find-first #(not= (key-fn %) a) xs)
-         (let [z (first xs), c (key-fn z)]
-           (if (= a c) y x)))))))
+(defn countp [pred coll]
+  (count (filter pred coll)))
 
 (defn rsort-by [keyfn coll]
   (sort-by keyfn #(compare %2 %1) coll))
