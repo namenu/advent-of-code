@@ -9,7 +9,7 @@
     (mapv #(Integer/parseInt %) numbers)))
 
 (defn diagnostic-code [program input]
-  (let [state (-> (->machine program) (add-input input) (run*))
+  (let [state (-> (->machine program) (add-input input) (run))
         diag  (find-first (complement zero?) (:output state))]
     (or diag 0)))
 

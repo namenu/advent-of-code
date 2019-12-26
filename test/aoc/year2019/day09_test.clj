@@ -3,7 +3,7 @@
             [clojure.test :refer :all]))
 
 (defn program->output [program]
-  (-> (->machine program) (run*) :output))
+  (-> (->machine program) (run) :output))
 
 (deftest part1
   (let [program [109, 1, 204, -1, 1001, 100, 1, 100, 1008, 100, 16, 101, 1006, 101, 0, 99]]

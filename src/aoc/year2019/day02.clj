@@ -10,7 +10,7 @@
 
 (defn part1 [program noun verb]
   (let [init (->machine (assoc program 1 noun 2 verb))]
-    (-> (run* init)
+    (-> (run init)
         (get-in [:program 0]))))
 
 (defn part2 [program output]

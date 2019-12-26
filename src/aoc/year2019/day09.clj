@@ -4,11 +4,11 @@
             [aoc.year2019.intcode :refer :all]))
 
 ; pt.1
-(-> (input->state (input 2019 9))
+(-> (input->machine (input 2019 9))
     (add-input 1)
-    (run*))
+    (run))
 
 ; pt.2
-(-> (input->state (input 2019 9))
+(-> (input->machine (input 2019 9))
     (add-input 2)
-    (run*))
+    (run))

@@ -45,13 +45,13 @@
 
 ; pt.1
 (let [in    (input 2019 11)
-      state (-> (input->state in)
+      state (-> (input->machine in)
                 (assoc :input-fn input-fn)
                 (assoc :output-fn output-fn))
       ]
   (reset-state)
   (swap! panels assoc [0 0] 1)
-  (run* state)
+  (run state)
   (prn (count @panels))
 
   (doseq [y (range 5 -10 -1)]

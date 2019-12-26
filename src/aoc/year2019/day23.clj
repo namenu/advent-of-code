@@ -9,7 +9,7 @@
 
 (defn make-computer [address]
   {:address address
-   :nic     (-> (input->state in)
+   :nic     (-> (input->machine in)
                 (add-input address))
    :queue   PersistentQueue/EMPTY})
 
@@ -23,7 +23,7 @@
   (update computer :queue conj x y))
 
 (defn run-enough [{:keys [nic] :as computer}]
-  (let [nic'   (run* nic)
+  (let [nic'   (run nic)
         ; copy to buffer
         buffer (:output nic')
 

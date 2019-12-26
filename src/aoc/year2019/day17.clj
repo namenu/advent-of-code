@@ -6,7 +6,7 @@
             [clojure.string :as str]))
 
 ; pt.1
-(let [output   (-> (input 2019 17) (input->state) (run*) :output)
+(let [output   (-> (input 2019 17) (input->machine) (run) :output)
       grid-str (apply str (map char output))
       ;grid-str "..#..........\n..#..........\n#######...###\n#.#...#...#.#\n#############\n..#...#...#..\n..#####...^.."
       grid     (parse-grid grid-str)
@@ -30,6 +30,6 @@
                   "L,8,R,6,L,10,L,10\n"
                   ",y\n")
       feed   (map int cmd)
-      robot  (input->state (input 2019 17))
+      robot  (input->machine (input 2019 17))
       robot' (reduce #(add-input %1 %2) robot feed)]
-  (peek (:output (run* robot'))))
+  (peek (:output (run robot'))))

@@ -7,13 +7,13 @@
 (defn walk-or-run [robot cmd]
   (let [inputs (map int cmd)
         robot  (reduce #(add-input %1 %2) robot inputs)
-        output (:output (run* robot))]
+        output (:output (run robot))]
     (if (= (peek output) 10)
       (doseq [l (str/split-lines (apply str (map char output)))]
         (println l))
       (peek output))))
 
-(let [robot (input->state (input 2019 21))]
+(let [robot (input->machine (input 2019 21))]
   ; pt.1
   (let [; ¬A∨¬B∨¬C ∧ D
         cmd (str "NOT A J\n"
@@ -40,5 +40,5 @@
                    "OR H T\n"
                    "AND T J\n"
                    "RUN\n")
-        robot (input->state (input 2019 21))]
+        robot (input->machine (input 2019 21))]
     (walk-or-run robot cmd)))

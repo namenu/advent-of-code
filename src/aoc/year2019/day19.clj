@@ -13,7 +13,7 @@
          (peek))))
 
 (def grid
-  (let [drone (input->state (input 2019 19))]
+  (let [drone (input->machine (input 2019 19))]
     (->> (for [x (range 50)
                y (range 50)
                :let [output (-> drone (add-input x) (add-input y) (run-output1))]]
@@ -26,7 +26,7 @@
 (print-grid grid identity)
 
 ; pt.2
-(let [drone (input->state (input 2019 19))
+(let [drone (input->machine (input 2019 19))
       beam? (fn [x y]
               (= 1 (-> drone (add-input x) (add-input y) (run-output1))))
       n     100]

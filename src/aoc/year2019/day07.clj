@@ -17,7 +17,7 @@
          input 0]
     (if amp
       (let [init   (add-input amp input)
-            output (-> (run* init) :output peek)]
+            output (-> (run init) :output peek)]
         (recur amps output))
       input)))
 

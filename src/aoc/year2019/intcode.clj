@@ -8,18 +8,23 @@
    :base    0
    :input   PersistentQueue/EMPTY
    :output  []
-   :status  :running})
+   :status  :runnable})
 
-(defn input->state [input]
-  (let [numbers (-> input str/trim (str/split #","))
-        program (mapv #(Long/parseLong %) numbers)]
-    (->machine program)))
+(defn parse-program [input]
+  (let [numbers (-> input str/trim (str/split #","))]
+    (mapv #(Long/parseLong %) numbers)))
+
+(defn input->machine [input]
+  (->machine (parse-program input)))
 
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
 
 (defn add-input [state value]
   (update state :input conj value))
+
+(defn get-output [state]
+  [(assoc state :output []) (:output state)])
 
 ; doesn't work for :input-fn mode
 (defn has-input? [state]
@@ -58,7 +63,7 @@
 (defn inst-size [opcode]
   ({1 4, 2 4, 3 2, 4 2, 5 3, 6 3, 7 4, 8 4, 9 2, 99 1} opcode))
 
-(defn run [{:keys [program base ip] :as state0}]
+(defn instruction-cycle [{:keys [program base ip] :as state0}]
   (let [[opcode modes] (decode (get program ip))
         params (mapv program (range (+ ip 1) (+ ip (inst-size opcode))))
         p-in   (fn [p]
@@ -84,7 +89,7 @@
       ; input (2)
       3 (if (has-input? state)
           (-> (load-input state (p-out 0))
-              (assoc :status :running))
+              (assoc :status :runnable))
           (assoc state0 :status :pause))
 
       ; output (2)
@@ -108,10 +113,10 @@
       99 (assoc state :status :halt))))
 
 (defn halted? [state] (= :halt (:status state)))
-(defn running? [state] (= :running (:status state)))
+(defn running? [state] (= :runnable (:status state)))
 
-(defn run* [state0]
-  (->> (iterate run state0)
+(defn run [state0]
+  (->> (iterate instruction-cycle state0)
        (next)
        (drop-while running?)
        (first)))

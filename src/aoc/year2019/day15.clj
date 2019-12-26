@@ -43,7 +43,7 @@
                 (recur ds droid'' grid''))))))
       grid)))
 
-(let [droid       (input->state (input 2019 15))
+(let [droid       (input->machine (input 2019 15))
       init-grid   {[0 0] 1}
       start-pos   [0 0]
       grid        (probe droid init-grid start-pos 0)
