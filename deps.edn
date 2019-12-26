@@ -1,14 +1,12 @@
-{:deps    {org.clojure/clojurescript      {:mvn/version "1.10.520"}
+{:deps    {org.clojure/core.async         {:mvn/version "0.4.490"}
+           org.clojure/core.match         {:mvn/version "0.3.0"}
            org.clojure/data.finger-tree   {:mvn/version "0.0.3"}
            org.clojure/data.priority-map  {:mvn/version "0.0.10"}
-           org.clojure/test.check         {:mvn/version "0.10.0-alpha3"}
-           org.clojure/core.async         {:mvn/version "0.4.490"}
-           org.clojure/core.match         {:mvn/version "0.3.0"}
            org.clojure/math.combinatorics {:mvn/version "0.1.6"}
            org.clojure/math.numeric-tower {:mvn/version "0.0.4"}
+           org.clojure/test.check         {:mvn/version "0.10.0-alpha3"}
            net.mikera/core.matrix         {:mvn/version "0.62.0"}
-           quil                           {:mvn/version "2.8.0"
-                                           :exclusions  [com.lowagie/itext]}}
+           quil                           {:mvn/version "2.8.0" :exclusions [com.lowagie/itext]}}
  :paths   ["src" "resources"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps  {com.cognitect/test-runner {:git/url "https://github.com/cognitect-labs/test-runner.git"
