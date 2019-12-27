@@ -82,7 +82,7 @@
                                     (let [new (cond-> (assoc cur :nodes (-> nodes (disj u) (conj v)))
                                                 (key? v) (update :keyring conj v))]
                                       [new dist])))))]
-      (second (A* start goal? h neighbor-fn)))))
+      (A* start goal? h neighbor-fn))))
 
 (defn split-grid [grid]
   (let [[start _] (first (filter #(= \@ (second %)) grid))]

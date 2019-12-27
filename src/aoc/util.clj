@@ -3,7 +3,7 @@
             [clojure.string :as str]))
 
 (defn input [year day]
-  (-> (format "year%d/day%02d.in" year day) io/resource slurp str/trim))
+  (-> (format "year%d/day%02d.in" year day) io/resource slurp))
 
 (defn input-lines [year day]
   (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq))
