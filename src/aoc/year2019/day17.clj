@@ -6,10 +6,11 @@
             [clojure.string :as str]))
 
 ; pt.1
-(let [output   (-> (input 2019 17) (input->machine) (run) :output)
-      grid-str (apply str (map char output))
-      ;grid-str "..#..........\n..#..........\n#######...###\n#.#...#...#.#\n#############\n..#...#...#..\n..#####...^.."
-      grid     (parse-grid grid-str)
+(let [[_ output] (-> (input->machine (input 2019 17))
+                     (run)
+                     (get-output {:ascii true}))
+      ;output "..#..........\n..#..........\n#######...###\n#.#...#...#.#\n#############\n..#...#...#..\n..#####...^.."
+      grid     (parse-grid output)
       scaffold (->> (filter #(= \# (second %)) grid)
                     (map first)
                     (set))
@@ -24,12 +25,11 @@
 (comment
   (str/split-lines grid-str))
 
-(let [cmd    (str "A,A,B,C,B,C,B,C,A,C\n"
-                  "R,6,L,8,R,8\n"
-                  "R,4,R,6,R,6,R,4,R,4\n"
-                  "L,8,R,6,L,10,L,10\n"
-                  ",y\n")
-      feed   (map int cmd)
-      robot  (input->machine (input 2019 17))
-      robot' (reduce #(add-input %1 %2) robot feed)]
-  (peek (:output (run robot'))))
+(let [cmd   (str "A,A,B,C,B,C,B,C,A,C\n"
+                 "R,6,L,8,R,8\n"
+                 "R,4,R,6,R,6,R,4,R,4\n"
+                 "L,8,R,6,L,10,L,10\n"
+                 ",y\n")
+      robot (-> (input->machine (input 2019 17))
+                (add-input cmd {:ascii true}))]
+  (peek (:output (run robot))))

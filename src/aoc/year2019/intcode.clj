@@ -20,13 +20,17 @@
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
 
-(defn add-input [state value]
-  (update state :input conj value))
+(defn add-input
+  "possible opts => :ascii"
+  [state value & [opts]]
+  (if (:ascii opts)
+    (update state :input into (map int value))
+    (update state :input conj value)))
 
 (defn get-output
   "possible opts => :keep, :ascii"
   [state & [opts]]
-  [(if :keep
+  [(if (:keep opts)
      state
      (assoc state :output [])),
    (if (:ascii opts)

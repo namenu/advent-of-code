@@ -5,12 +5,11 @@
             [clojure.string :as str]))
 
 (defn walk-or-run [robot cmd]
-  (let [inputs (map int cmd)
-        robot  (reduce #(add-input %1 %2) robot inputs)
-        output (:output (run robot))]
+  (let [opts   {:ascii true}
+        robot  (-> robot (add-input cmd opts) (run))
+        output (:output robot)]
     (if (= (peek output) 10)
-      (doseq [l (str/split-lines (apply str (map char output)))]
-        (println l))
+      (println (get-output robot opts))
       (peek output))))
 
 (let [robot (input->machine (input 2019 21))]

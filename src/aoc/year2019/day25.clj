@@ -8,8 +8,8 @@
 (defn run-cmd [droid cmd & [opts]]
   ;(println ">> " cmd)
   (let [opts (merge {:ascii true} opts)
-        feed (map int cmd)
-        [droid' output] (-> (reduce #(add-input %1 %2) droid feed)
+        [droid' output] (-> droid
+                            (add-input cmd opts)
                             (run)
                             (get-output opts))]
     ;(println output)
