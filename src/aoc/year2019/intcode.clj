@@ -23,8 +23,15 @@
 (defn add-input [state value]
   (update state :input conj value))
 
-(defn get-output [state]
-  [(assoc state :output []) (:output state)])
+(defn get-output
+  "possible opts => :keep, :ascii"
+  [state & [opts]]
+  [(if :keep
+     state
+     (assoc state :output [])),
+   (if (:ascii opts)
+     (->> (:output state) (map char) (apply str))
+     (:output state))])
 
 ; doesn't work for :input-fn mode
 (defn has-input? [state]
