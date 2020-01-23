@@ -19,9 +19,10 @@
     (async/>!! in input)
     (last (from-chan out))))
 
-(let [program (input->program (input 2019 5))]
-  ; pt.1
-  (prn (diagnostic-code program 1))
+(comment
+  (let [program (input->program (input 2019 5))]
+    ; pt.1
+    (prn (diagnostic-code program 1))
 
-  ; pt.2
-  (prn (diagnostic-code program 5)))
+    ; pt.2
+    (prn (diagnostic-code program 5))))
