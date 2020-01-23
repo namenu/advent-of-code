@@ -1,7 +1,6 @@
 (ns aoc.year2019.intcode
   (:require [clojure.string :as str]
-            [clojure.core.async :as async])
-  (:import (clojure.lang PersistentQueue)))
+            [clojure.core.async :as async]))
 
 (defn ->machine [program in out]
   {:program (into {} (map-indexed vector program))
@@ -21,12 +20,12 @@
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
 
-(defn add-input
-  "possible opts => :ascii"
-  [state value & [opts]]
-  (if (:ascii opts)
-    (update state :input into (map int value))
-    (update state :input conj value)))
+#_(defn add-input
+    "possible opts => :ascii"
+    [state value & [opts]]
+    (if (:ascii opts)
+      (update state :input into (map int value))
+      (update state :input conj value)))
 
 (defn read-input [state addr]
   (let [val (async/<!! (:in-ch state))]
@@ -114,15 +113,12 @@
 
       99 (halt state))))
 
-(defn halted? [state] (= :halt (:status state)))
 (defn running? [state] (= :runnable (:status state)))
 
-(defn run [state0]
-  (async/thread
-    (->> (iterate instruction-cycle state0)
-         (next)
-         (drop-while running?)
-         (first))))
-
 (defn run-program [program in out]
-  (run (->machine program in out)))
+  (let [state0 (->machine program in out)]
+    (async/thread
+      (->> (iterate instruction-cycle state0)
+           (next)
+           (drop-while running?)
+           (first)))))

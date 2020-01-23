@@ -2,6 +2,7 @@
 (ns aoc.year2019.day07
   (:require [aoc.util :refer [input find-first]]
             [aoc.year2019.intcode :refer :all]
+            [clojure.core.async :as async]
             [clojure.math.combinatorics :as combo]
             [clojure.string :as str]))
 
@@ -10,16 +11,22 @@
     (mapv #(Integer/parseInt %) numbers)))
 
 (defn make-amp [program phase]
-  (add-input (->machine program) phase))
+  (let [in  (async/chan)
+        out (async/chan)]
+    (run-program program in out)
+    (async/>!! in phase)
+    [in out]))
+
+(defn make-amps [program phases]
+  (let [[a b c d e f] (repeatedly async/chan 6)]
+    ))
 
 (defn amplify [amps]
-  (loop [[amp & amps] amps
-         input 0]
-    (if amp
-      (let [init   (add-input amp input)
-            output (-> (run init) :output peek)]
-        (recur amps output))
-      input)))
+  (reduce (fn [input [amp-in amp-out]]
+            (let [_ (async/>!! amp-in input)]
+              (async/<!! amp-out)))
+          0
+          amps))
 
 (defn max-thruster [program amplifier phases]
   (->> (for [phases (combo/permutations phases)
@@ -27,30 +34,18 @@
          (amplifier amps))
        (apply max,,,)))
 
-(defn get-output [state]
-  (let [output-cnt (count (:output state))]
-    (->> (iterate run state)
-         (find-first #(or (> (count (:output %)) output-cnt) (halted? %))))))
-
 (defn amplify-fb [amps]
-  (loop [amps  amps
-         idx   0
-         input 0]
-    (let [before (add-input (get amps idx) input)
-          after  (get-output before)
-          output (peek (:output after))]
-      (if (and (= idx 4) (halted? after))
-        output
+  (reduce (fn [input [amp-in amp-out]]
+            (if-let [_ (async/>!! amp-in input)]
+              (async/<!! amp-out)
+              (reduced input)))
+          0
+          (cycle amps)))
 
-        (recur (assoc amps idx after)
-               (rem (inc idx) 5)
-               output
-               )))))
-
-
-(let [program (input->program (input 2019 7))]
-  ; pt.1
-  (max-thruster program amplify [0 1 2 3 4])
-  ; pt.2
-  (max-thruster program amplify-fb [9 7 8 5 6])
-  )
+(comment
+  (let [program (input->program (input 2019 7))]
+    ; pt.1
+    (prn (max-thruster program amplify [0 1 2 3 4]))
+    ; pt.2
+    (prn (max-thruster program amplify-fb [9 7 8 5 6]))
+    ))
