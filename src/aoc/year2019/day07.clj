@@ -16,11 +16,11 @@
                             c)
                          phases)
         f (async/chan)]
-    (run-program program a b "A")
-    (run-program program b c "B")
-    (run-program program c d "C")
-    (run-program program d e "D")
-    (run-program program e f "E")
+    (run-program program a b)
+    (run-program program b c)
+    (run-program program c d)
+    (run-program program d e)
+    (run-program program e f)
     [a f]))
 
 (defn amplify-0 [[amps-in amps-out]]

@@ -1,5 +1,5 @@
 (ns aoc.year2019.intcode
-  (:require [clojure.string :as str]
+  (:require [aoc.util :refer [find-first]]
             [clojure.core.async :as async]))
 
 (defn ->machine [program in out]
@@ -9,13 +9,6 @@
    :in-ch   in
    :out-ch  out
    :status  :runnable})
-
-(defn parse-program [input]
-  (let [numbers (-> input str/trim (str/split #","))]
-    (mapv #(Long/parseLong %) numbers)))
-
-(defn input->machine [input]
-  (->machine (parse-program input)))
 
 (defn binary-op [program op i1 i2 o]
   (assoc program o (op i1 i2)))
@@ -113,12 +106,10 @@
 
       99 (halt state))))
 
-(defn running? [state] (= :runnable (:status state)))
+(defn halted? [state] (= :halt (:status state)))
 
 (defn run-program [program in out]
   (let [state0 (->machine program in out)]
     (async/thread
       (->> (iterate instruction-cycle state0)
-           (next)
-           (drop-while running?)
-           (first)))))
+           (find-first halted?)))))

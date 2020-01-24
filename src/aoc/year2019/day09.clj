@@ -1,14 +1,20 @@
 ;; --- Day 9: Sensor Boost ---
 (ns aoc.year2019.day09
-  (:require [aoc.util :refer [input]]
-            [aoc.year2019.intcode :refer :all]))
+  (:require [aoc.util :refer [input-ints]]
+            [aoc.year2019.intcode :refer :all]
+            [clojure.core.async :as async]))
 
-; pt.1
-(-> (input->machine (input 2019 9))
-    (add-input 1)
-    (run))
+(defn run-with-mode [program mode]
+  (let [in  (async/chan 1)
+        out (async/chan)]
+    (async/>!! in mode)
+    (run-program program in out)
+    (async/<!! out)))
 
-; pt.2
-(-> (input->machine (input 2019 9))
-    (add-input 2)
-    (run))
+(comment
+  (let [program (input-ints 2019 9 ",")]
+    ; pt.1
+    (prn (run-with-mode program 1))
+
+    ; pt.2
+    (prn (run-with-mode program 2))))

@@ -1,13 +1,8 @@
 ;; --- Day 5: Sunny with a Chance of Asteroids ---
 (ns aoc.year2019.day05
-  (:require [aoc.util :refer [input find-first]]
+  (:require [aoc.util :refer [input-ints]]
             [clojure.core.async :as async]
-            [clojure.string :as str]
             [aoc.year2019.intcode :refer :all]))
-
-(defn input->program [input]
-  (let [numbers (-> input str/trim (str/split #","))]
-    (mapv #(Integer/parseInt %) numbers)))
 
 (defn from-chan [ch]
   (take-while identity (repeatedly #(async/<!! ch))))
@@ -20,7 +15,7 @@
     (last (from-chan out))))
 
 (comment
-  (let [program (input->program (input 2019 5))]
+  (let [program (input-ints 2019 5 ",")]
     ; pt.1
     (prn (diagnostic-code program 1))
 

@@ -8,6 +8,10 @@
 (defn input-lines [year day]
   (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq))
 
+(defn input-ints [year day delimiter]
+  (let [numbers (-> (input year day) (str/trim) (str/split (re-pattern delimiter)))]
+    (mapv #(Integer/parseInt %) numbers)))
+
 (defn find-first [pred coll]
   (first (filter pred coll)))
 
