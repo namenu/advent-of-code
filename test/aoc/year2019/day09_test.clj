@@ -1,5 +1,5 @@
 (ns aoc.year2019.day09-test
-  (:require [aoc.util :refer [input-ints]]
+  (:require [aoc.util :refer [input-nums]]
             [aoc.year2019.day09 :refer [run-with-mode]]
             [clojure.test :refer :all]))
 
@@ -12,6 +12,6 @@
     (is (= 1125899906842624 (run-with-mode program 0))))
 
   (testing "boost mode"
-    (let [program (input-ints 2019 9 ",")]
+    (let [program (input-nums 2019 9 ",")]
       (is (= 4080871669 (run-with-mode program 1)))
       (is (= 75202 (run-with-mode program 2))))))

@@ -1,7 +1,8 @@
 ;; --- Day 11: Space Police ---
 (ns aoc.year2019.day11
-  (:require [aoc.util :refer [input cart->polar]]
-            [aoc.year2019.intcode :refer :all]))
+  (:require [aoc.util :refer [input-nums cart->polar]]
+            [aoc.year2019.intcode :refer :all]
+            [clojure.core.async :as async]))
 
 (defn move [{:keys [pos dir] :as robot}]
   (let [[x y] pos
@@ -15,49 +16,44 @@
       (assoc robot :dir [dy (- dx)]))))
 
 (defn read-panel [panels pos]
-  (or (get panels pos) 0))
+  (get panels pos 0))
 
-(def panels (atom {}))
-(def robot (atom {:pos    [0 0]
-                  :dir    [0 1]
-                  :buffer nil}))
+(defn update-state [{:keys [robot] :as state} color direction]
+  (-> state
+      (update :panels assoc (:pos robot) color)
+      (update :robot turn direction)
+      (update :robot move)))
 
-(defn reset-state []
-  (reset! panels {})
-  (reset! robot {:pos    [0 0]
-                 :dir    [0 1]
-                 :buffer nil}))
+(defn probe [start-color]
+  (let [in  (async/chan 1)
+        out (async/chan)]
+    (run-program (input-nums 2019 11 ",") in out)
+    (async/<!!
+      (async/go-loop [state {:panels {[0 0] start-color}
+                             :robot  {:pos [0 0]
+                                      :dir [0 1]}}]
+        (let [input (read-panel (:panels state) (get-in state [:robot :pos]))]
+          (async/>!! in input))
 
-(defn input-fn []
-  ;(prn "input cb")
-  (read-panel @panels (:pos @robot)))
+        (let [o1 (async/<!! out)
+              o2 (async/<!! out)]
+          (if o1
+            (recur (update-state state o1 o2))
+            state))))))
 
-(defn output-fn [output]
-  ;(prn "output cb" output)
-  (if-let [color (:buffer @robot)]
-    (do
-      (swap! panels assoc (:pos @robot) color)
-      (swap! robot turn output)
-      (swap! robot move)
-      (swap! robot assoc :buffer nil))
-    (swap! robot assoc :buffer output)))
+(comment
+  ; pt.1
+  (let [state  (probe 0)
+        panels (:panels state)]
+    (prn (count panels)))
 
-
-; pt.1
-(let [in    (input 2019 11)
-      state (-> (input->machine in)
-                (assoc :input-fn input-fn)
-                (assoc :output-fn output-fn))
-      ]
-  (reset-state)
-  (swap! panels assoc [0 0] 1)
-  (run state)
-  (prn (count @panels))
-
-  (doseq [y (range 5 -10 -1)]
-    (let [s (map (fn [x]
-                   (if (zero? (read-panel @panels [x y]))
-                     "◾️"
-                     "▫️️️️"))
-                 (range -5 50))]
-      (println (apply str s)))))
+  ; pt.2
+  (let [state  (probe 1)
+        panels (:panels state)]
+    (doseq [y (range 5 -10 -1)]
+      (let [s (map (fn [x]
+                     (if (zero? (read-panel panels [x y]))
+                       "◾️"
+                       "▫️️️️"))
+                   (range -5 50))]
+        (println (apply str s))))))

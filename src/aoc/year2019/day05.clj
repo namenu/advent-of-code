@@ -1,6 +1,6 @@
 ;; --- Day 5: Sunny with a Chance of Asteroids ---
 (ns aoc.year2019.day05
-  (:require [aoc.util :refer [input-ints]]
+  (:require [aoc.util :refer [input-nums]]
             [clojure.core.async :as async]
             [aoc.year2019.intcode :refer :all]))
 
@@ -15,7 +15,7 @@
     (last (from-chan out))))
 
 (comment
-  (let [program (input-ints 2019 5 ",")]
+  (let [program (input-nums 2019 5 ",")]
     ; pt.1
     (prn (diagnostic-code program 1))
 

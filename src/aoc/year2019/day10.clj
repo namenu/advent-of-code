@@ -1,8 +1,7 @@
 ;; --- Day 10: Monitoring Station ---
 (ns aoc.year2019.day10
   (:require [aoc.util :refer [input cart->polar]]
-            [aoc.grid :refer [parse-grid]]
-            [aoc.year2019.intcode :refer :all]))
+            [aoc.grid :refer [parse-grid]]))
 
 ; pt.1
 (defn already-hit? [[dx dy] hits]

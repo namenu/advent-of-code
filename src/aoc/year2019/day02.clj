@@ -1,6 +1,6 @@
 ;; --- Day 2: 1202 Program Alarm ---
 (ns aoc.year2019.day02
-  (:require [aoc.util :refer [input-ints find-first]]
+  (:require [aoc.util :refer [input-nums find-first]]
             [aoc.year2019.intcode :refer :all]
             [clojure.core.async :as async]))
 
@@ -20,7 +20,7 @@
       (+ (* 100 n) v))))
 
 (comment
-  (let [program (input-ints 2019 2 ",")]
+  (let [program (input-nums 2019 2 ",")]
     ; pt.1
     (prn (part1 program 12 2))
 
