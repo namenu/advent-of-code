@@ -1,14 +1,9 @@
 ;; --- Day 7: Amplification Circuit ---
 (ns aoc.year2019.day07
-  (:require [aoc.util :refer [input find-first]]
+  (:require [aoc.util :refer [input-nums]]
             [aoc.year2019.intcode :refer :all]
             [clojure.core.async :as async]
-            [clojure.math.combinatorics :as combo]
-            [clojure.string :as str]))
-
-(defn input->program [input]
-  (let [numbers (-> input str/trim (str/split #","))]
-    (mapv #(Integer/parseInt %) numbers)))
+            [clojure.math.combinatorics :as combo]))
 
 (defn make-amps [program phases]
   (let [[a b c d e] (map #(let [c (async/chan 1)]
@@ -16,11 +11,11 @@
                             c)
                          phases)
         f (async/chan)]
-    (run-program program a b)
-    (run-program program b c)
-    (run-program program c d)
-    (run-program program d e)
-    (run-program program e f)
+    (run-program! program {:in a :out b})
+    (run-program! program {:in b :out c})
+    (run-program! program {:in c :out d})
+    (run-program! program {:in d :out e})
+    (run-program! program {:in e :out f})
     [a f]))
 
 (defn amplify-0 [[amps-in amps-out]]
@@ -37,10 +32,10 @@
   (->> (for [phases (combo/permutations phase-range)
              :let [amps (make-amps program phases)]]
          (amplifier amps))
-       (apply max,,,)))
+       (apply max)))
 
 (comment
-  (let [program (input->program (input 2019 7))]
+  (let [program (input-nums 2019 7 ",")]
     ; pt.1
     (prn (max-thruster program amplify-0 [0 1 2 3 4]))
     ; pt.2

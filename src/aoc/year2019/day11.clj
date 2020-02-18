@@ -27,19 +27,18 @@
 (defn probe [start-color]
   (let [in  (async/chan 1)
         out (async/chan)]
-    (run-program (input-nums 2019 11 ",") in out)
-    (async/<!!
-      (async/go-loop [state {:panels {[0 0] start-color}
-                             :robot  {:pos [0 0]
-                                      :dir [0 1]}}]
-        (let [input (read-panel (:panels state) (get-in state [:robot :pos]))]
-          (async/>!! in input))
+    (run-program! (input-nums 2019 11 ",") {:in in :out out})
+    (loop [state {:panels {[0 0] start-color}
+                  :robot  {:pos [0 0]
+                           :dir [0 1]}}]
+      (let [input (read-panel (:panels state) (get-in state [:robot :pos]))]
+        (async/>!! in input))
 
-        (let [o1 (async/<!! out)
-              o2 (async/<!! out)]
-          (if o1
-            (recur (update-state state o1 o2))
-            state))))))
+      (let [o1 (async/<!! out)
+            o2 (async/<!! out)]
+        (if o1
+          (recur (update-state state o1 o2))
+          state)))))
 
 (comment
   ; pt.1

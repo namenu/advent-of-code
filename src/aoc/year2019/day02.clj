@@ -1,14 +1,13 @@
 ;; --- Day 2: 1202 Program Alarm ---
 (ns aoc.year2019.day02
-  (:require [aoc.util :refer [input-nums find-first]]
+  (:require [aoc.util :refer [input-nums]]
             [aoc.year2019.intcode :refer :all]
             [clojure.core.async :as async]))
 
 (defn part1
   ([program]
-   (let [res (-> (run-program program (async/chan) (async/chan))
-                 (async/<!!))]
-     (get-in res [:program 0])))
+   (let [res (async/<!! (run-program! program))]
+     (get-in res [:memory 0])))
   ([program noun verb]
    (part1 (assoc program 1 noun 2 verb))))
 
