@@ -1,3 +1,5 @@
+open Belt;
+
 let input = {
   let lines =
     Node_fs.readFileAsUtf8Sync("input/day02.in")

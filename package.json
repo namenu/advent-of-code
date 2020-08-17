@@ -5,9 +5,7 @@
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w"
   },
-  "dependencies": {
-    "immutable": "^4.0.0-rc.12"
-  },
+  "dependencies": {},
   "devDependencies": {
     "bs-platform": "^8.2.0",
     "gentype": "^3.31.0"

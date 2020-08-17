@@ -1,3 +1,5 @@
+open Belt;
+
 let input = Node_fs.readFileSync("input/day01.in", `utf8);
 
 let list_of_digits = input =>
