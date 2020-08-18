@@ -42,3 +42,11 @@ let part2 = () => {
 
 part1()->Js.log;
 part2()->Js.log;
+
+/**
+ * early return을 위해 reduce 대신 pattern matching을 써봤습니다.
+ * 근데 역시나 List 자료형이라 Array<->List 를 해야 했고, 문제가 있는 코드라는 생각입니다.
+ *
+ * 아직까지 제가 type을 정의하지 않았는데, 이게 과거 습관 때문인 것 같습니다.
+ * 앞으로는 다른 사람들의 하스켈 코드를 좀 참고해서 Type Driven Development를 해보려고요.
+ */

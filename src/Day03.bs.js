@@ -40,10 +40,7 @@ function part2(param) {
 
 part2(undefined);
 
-var input = "#A141481: Square spiral of sums of selected preceding terms, starting at 1..\n#Table of n, a(n) for n = 1..961\n1 1\n2 1\n3 2\n4 4\n5 5\n6 10\n7 11\n8 23\n9 25\n10 26\n11 54\n12 57\n13 59\n14 122\n15 133\n16 142\n17 147\n18 304\n19 330\n20 351\n21 362";
-
 exports.gets = gets;
-exports.input = input;
 exports.solve = solve;
 exports.part2 = part2;
 /*  Not a pure module */
