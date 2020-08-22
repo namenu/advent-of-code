@@ -68,4 +68,21 @@ module Cpu = {
 let input = Node_fs.readFileAsUtf8Sync("input/day08.in");
 let insts = input->Js.String2.split("\n")->Array.map(Instruction.fromString);
 
-Array.reduce(insts, Cpu.make(), Cpu.exec)->Cpu.getMaximum->Js.log;
+let part1 = () => {
+  Array.reduce(insts, Cpu.make(), Cpu.exec)->Cpu.getMaximum->Js.log;
+};
+
+let part2 = () => {
+  let rec findHighest = (cpu, insts) => {
+    switch (insts) {
+    | [] => Cpu.getMaximum(cpu)
+    | [inst, ...insts] =>
+      max(Cpu.getMaximum(cpu), findHighest(Cpu.exec(cpu, inst), insts))
+    };
+  };
+
+  findHighest(Cpu.make(), List.fromArray(insts))->Js.log;
+};
+
+part1();
+part2();
