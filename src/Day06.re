@@ -1,6 +1,5 @@
 open Belt;
 
-let input = [|0, 2, 7, 0|];
 let input =
   Node_fs.readFileAsUtf8Sync("input/day06.in")
   ->Js.String2.trim
@@ -61,5 +60,5 @@ let bankStream = init => {
 
 let (from, to_) = bankStream(input)->findDupe->Option.getExn;
 
-Js.log(to_);
-Js.log(to_ - from);
+let part1 = () => Js.log(to_);
+let part2 = () => Js.log(to_ - from);

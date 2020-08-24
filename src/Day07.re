@@ -58,9 +58,3 @@ let rec findRoot = (tree, node) => {
 let part1 = () => {
   buildParentMap(programs)->findRoot("llyhqfe")->Js.log;
 };
-
-// Map<parent, (weight, children)>
-let buildTree => programs => {
-
-}
-
