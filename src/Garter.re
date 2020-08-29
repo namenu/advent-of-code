@@ -17,6 +17,20 @@ module List = {
 };
 
 module Array = {
+  let scan = (xs, init, f) => {
+    open Belt.Array;
+    let ar = makeUninitializedUnsafe(length(xs));
+    let cur = ref(init);
+    Belt.Array.forEachWithIndex(
+      xs,
+      (idx, x) => {
+        cur := f(cur^, x);
+        setUnsafe(ar, idx, cur^);
+      },
+    );
+    ar;
+  };
+
   /** Returns (max_value, index). Array may not be empty. */
   let maxIndex = xs => {
     let init = (Belt.Array.getUnsafe(xs, 0), 0);
