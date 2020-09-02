@@ -17,18 +17,19 @@ module List = {
 };
 
 module Array = {
+  /** reduce와 비슷하나 중간 결과를 모두 포함한 array를 반환해줌 */
   let scan = (xs, init, f) => {
     open Belt.Array;
-    let ar = makeUninitializedUnsafe(length(xs));
+    let state = makeUninitializedUnsafe(length(xs));
     let cur = ref(init);
     Belt.Array.forEachWithIndex(
       xs,
       (idx, x) => {
         cur := f(cur^, x);
-        setUnsafe(ar, idx, cur^);
+        setUnsafe(state, idx, cur^);
       },
     );
-    ar;
+    state;
   };
 
   /** Returns (max_value, index). Array may not be empty. */

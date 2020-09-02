@@ -1,7 +1,7 @@
 open Belt;
 
 module Walls = {
-  type t = {layers: Map.Int.t(int)};
+  type t = Map.Int.t(int);
 
   let fromString = text => {
     let parse = s => {
@@ -9,37 +9,31 @@ module Walls = {
       (Array.getUnsafe(kv, 0), Array.getUnsafe(kv, 1));
     };
 
-    let layers =
-      text
-      ->Js.String2.trim
-      ->Js.String2.split("\n")
-      ->Array.map(parse)
-      ->Map.Int.fromArray;
-
-    {layers: layers};
+    text
+    ->Js.String2.trim
+    ->Js.String2.split("\n")
+    ->Array.map(parse)
+    ->Map.Int.fromArray;
   };
 
   let severity = w => {
-    w.layers
+    w
     ->Map.Int.keep((k, v) => {
         let period = (v - 1) * 2;
         k mod period == 0;
       })
-    ->Map.Int.reduce(0, (acc, k, v) => {acc + k * v});
+    ->Map.Int.reduce(0, (acc, k, v) => acc + k * v);
   };
 
   let wasCaught = (w, ~delay) => {
-    w.layers
-    ->Map.Int.some((k, v) => {
-        let period = (v - 1) * 2;
-        (k + delay) mod period == 0;
-      });
+    w->Map.Int.some((k, v) => {
+      let period = (v - 1) * 2;
+      (k + delay) mod period == 0;
+    });
   };
 };
 
-let input = "0: 3\n1: 2\n4: 4\n6: 4";
 let input = Node.Fs.readFileAsUtf8Sync("input/day13.in");
-
 let w = Walls.fromString(input);
 
 let part1 = () => Walls.severity(w)->Js.log;
