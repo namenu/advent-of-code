@@ -70,3 +70,20 @@
 
 (defn cart->polar [[x y]]
   [(Math/sqrt (+ (* x x) (* y y))) (Math/atan2 y x)])
+
+
+(defn ordered-pairs
+  "For a given seq s, it generates all ordered pairs as a lazy-seq..
+
+   (ordered-pairs (range 3))
+   => ([0 1] [0 2] [1 1] [1 2] [2 2])
+  "
+  [s]
+  (letfn [(f0 [[s-first & s-next :as s] [t-first & t-next]]
+            (lazy-seq
+              (if s-first
+                (if t-first
+                  (cons [s-first t-first] (f0 s t-next))
+                  (f0 s-next (next s-next)))
+                nil)))]
+    (f0 s (next s))))

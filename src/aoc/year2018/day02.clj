@@ -1,4 +1,5 @@
-(ns aoc.year2018.day02)
+(ns aoc.year2018.day02
+  (:require [aoc.util :refer [find-first countp ordered-pairs]]))
 
 (defn fingerprint [id]
   (let [occurs (into #{} (vals (frequencies id)))]
@@ -8,23 +9,18 @@
 (defn part1 [input]
   (reduce * (reduce #(map + %1 %2) (map fingerprint input))))
 
-
-(defn diff [x y]
-  (->> (map #(- (int %1) (int %2)) x y)
-       (remove zero?)
-       count))
+(defn num-diffs [x y]
+  (->> (map = x y)
+       (countp false?)))
 
 (defn common-letters [x y]
   (apply str (map #(if (= %1 %2) %1 nil) x y)))
 
 (defn part2 [input]
-  (let [[x y] (first
-                (for [i input
-                      j input
-                      :when (= (diff i j) 1)]
-                  [i j]))]
+  (let [[x y] (->> (ordered-pairs input)
+                   (find-first (fn [[x y]]
+                                 (= (num-diffs x y) 1))))]
     (common-letters x y)))
-
 
 ;; tests
 (require '[clojure.test :refer [deftest is run-tests]])
