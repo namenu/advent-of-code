@@ -12,7 +12,7 @@ module Program = {
 
     let head = Array.getUnsafe(headBody, 0);
     let (name, weight) = {
-      let r = [%re "/(\w+) \((\d+)\)/"]->Js.Re.exec_(head)->Option.getExn;
+      let r = [%re "/(\\w+) \\((\\d+)\\)/"]->Js.Re.exec_(head)->Option.getExn;
       let matches = Js.Re.captures(r)->Array.map(Js.Nullable.toOption);
       (
         Js.Array2.unsafe_get(matches, 1)->Option.getExn,

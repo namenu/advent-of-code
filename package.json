@@ -1,13 +1,16 @@
 {
-  "name": "aoc-2017-reason",
+  "name": "advent-of-reason",
+  "license": "ISC",
   "scripts": {
     "clean": "bsb -clean-world",
     "build": "bsb -make-world",
     "watch": "bsb -make-world -w"
   },
-  "dependencies": {},
+  "dependencies": {
+    "bs-bastet": "^1.2.5",
+    "bs-let": "^0.1.16"
+  },
   "devDependencies": {
-    "bs-platform": "^8.2.0",
-    "gentype": "^3.31.0"
+    "bs-platform": "^8.3.0"
   }
 }

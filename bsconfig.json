@@ -10,8 +10,10 @@
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
+    "bs-bastet"
   ],
   "bsc-flags": [],
+  "ppx-flags": ["bs-let/ppx"],
   "warnings": {
     "error" : "+101"
   },

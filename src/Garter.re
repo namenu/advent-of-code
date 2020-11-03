@@ -17,6 +17,8 @@ module List = {
 };
 
 module Array = {
+  let isEmpty = ar => Belt.Array.size(ar) === 0;
+
   /** reduce와 비슷하나 중간 결과를 모두 포함한 array를 반환해줌 */
   let scan = (xs, init, f) => {
     open Belt.Array;
