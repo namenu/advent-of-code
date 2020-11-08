@@ -1,4 +1,4 @@
-let input = "0 <-> 2
+let sampleInput = "0 <-> 2
 1 <-> 1
 2 <-> 0, 3, 4
 3 <-> 2, 4
