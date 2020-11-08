@@ -19,49 +19,29 @@ let parse = s => {
 };
 
 module Graph = {
-  module V = Belt.Set.Int;
+  module IntCmp =
+    Belt.Id.MakeComparable({
+      type t = int;
+      let cmp = Pervasives.compare;
+    });
+  include Graph.MakeGraph(IntCmp);
+
   module E = Belt.Map.Int;
 
-  type t = E.t(array(int));
-  type vertex = int;
-  type vertices = V.t;
+  type edges = E.t(array(int));
 
-  let fromInput = (input): t => {
-    input
-    ->Js.String2.trim
-    ->Js.String2.split("\n")
-    ->Belt.Array.keepMap(parse)
-    ->E.fromArray;
-  };
+  let fromInput = input => {
+    let edges =
+      input
+      ->Js.String2.trim
+      ->Js.String2.split("\n")
+      ->Belt.Array.keepMap(parse)
+      ->E.fromArray;
 
-  let nodes = g => g->E.keysToArray->V.fromArray;
-
-  let neighbors = (g, v) => E.getExn(g, v)->V.fromArray;
-
-  let dfs = (g, startNode): vertices => {
-    let rec visit = (curNode, visited: vertices) => {
-      g
-      ->neighbors(curNode)
-      ->V.reduce(V.add(visited, curNode), (visited, nextNode) => {
-          V.has(visited, nextNode) ? visited : visit(nextNode, visited)
-        });
+    {
+      nodes: edges->E.keysToArray->verticesFromArray,
+      neighbors: v => E.getExn(edges, v)->verticesFromArray,
     };
-
-    visit(startNode, V.empty);
-  };
-
-  let groups = (g): list(vertices) => {
-    let rec visitAll = (unvisited: vertices): list(vertices) => {
-      switch (unvisited->V.toList) {
-      | [] => []
-      | [u, ..._] =>
-        let visited = dfs(g, u);
-        [visited, ...visitAll(unvisited->V.removeMany(visited->V.toArray))];
-      };
-    };
-
-    let unvisited = g->nodes;
-    visitAll(unvisited);
   };
 };
 

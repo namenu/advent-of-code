@@ -9,6 +9,8 @@ module MakeGraph = (M: Belt.Id.Comparable) => {
     neighbors: vertex => vertices,
   };
 
+  let verticesFromArray = V.fromArray(_, ~id=(module M));
+
   let dfs = (g: t('a), startNode): vertices => {
     let rec visit = (curNode, visited: vertices) => {
       g.neighbors(curNode)
