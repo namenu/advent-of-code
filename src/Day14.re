@@ -18,13 +18,18 @@ let part1 = input => {
 
 module Grid = {
   type coord = (int, int);
-  type t = array(array(int));
+
+  module CoordCmp =
+    Id.MakeComparable({
+      type t = coord;
+      let cmp = Pervasives.compare;
+    });
+
+  module GridGraph = Graph.MakeGraph(CoordCmp);
 
   let (maxX, maxY) = (127, 127);
 
-  let make = () => {
-    [|[||]|];
-  };
+  let toVertices = GridGraph.V.fromArray(_, ~id=(module CoordCmp));
 
   let adjacents = ((x, y)) => {
     let ret = [];
@@ -32,25 +37,29 @@ module Grid = {
     let ret = x < maxX ? List.add(ret, (x + 1, y)) : ret;
     let ret = y > 0 ? List.add(ret, (x, y - 1)) : ret;
     let ret = y < maxY ? List.add(ret, (x, y + 1)) : ret;
-    ret->List.toArray;
+    ret->List.toArray->toVertices;
   };
 
-  let countRegions = (g: t): int => {
-    0;
+  type t = GridGraph.vertices;
+
+  let make = (): t => {
+    [|(1, 0), (1, 1), (1, 2), (3, 0)|]->toVertices;
+  };
+
+  let makeGraph = (grid: t) => {
+    GridGraph.{
+      nodes: grid,
+      neighbors: v => adjacents(v)->GridGraph.V.keep(GridGraph.V.has(grid)),
+    };
+  };
+
+  let countRegions = g => {
+    g->GridGraph.groups->Belt.List.size;
   };
 };
 
-module CoordCmp =
-  Id.MakeComparable({
-    type t = (int, int);
-    let cmp = Pervasives.compare;
-  });
+Grid.make()->Grid.makeGraph->Grid.countRegions->Js.log
 
-(sampleInput ++ "-0")->KnotHash.fromString->KnotHash.toBinaryString->Js.log;
-
-Grid.adjacents((0, 1))
-->Set.fromArray(~id=(module CoordCmp))
-->Set.toArray
-->Js.log;
+// Comparable => Graph
 
 // Grid.adjacents((0, 1))->Js.log;

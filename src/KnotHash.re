@@ -74,20 +74,8 @@ let toString = (knot: t): string => {
   knot->Array.joinWith("", toHex);
 };
 
-module Garter_String = {
-  type t = string;
-
-  let charCode = s => {
-    int_of_float(Js.String2.charCodeAt(s, 0));
-  };
-
-  [@bs.val] external parseInt: (t, ~radix: int=?) => int = "parseInt";
-
-  [@bs.send] external padStart: (t, int, t) => t = "padStart";
-};
-
 let to4Bits = n => {
-  n->Js.Int.toStringWithRadix(~radix=2)->Garter_String.padStart(4, "0");
+  n->Js.Int.toStringWithRadix(~radix=2)->Garter.String.padStart(4, "0");
 };
 
 let toBinaryString = (knot: t): string => {
@@ -96,7 +84,7 @@ let toBinaryString = (knot: t): string => {
   ->Js.String2.castToArrayLike
   ->Js.Array2.from
   ->Array.joinWith("", h => {
-      let n = Garter_String.parseInt(h, ~radix=16);
+      let n = Garter.String.parseInt(h, ~radix=16);
       to4Bits(n);
     });
 };

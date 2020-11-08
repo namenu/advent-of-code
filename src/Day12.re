@@ -22,10 +22,11 @@ module Graph = {
   module V = Belt.Set.Int;
   module E = Belt.Map.Int;
 
+  type t = E.t(array(int));
+  type vertex = int;
   type vertices = V.t;
-  type edges = E.t(array(int));
 
-  let fromInput = (input): edges => {
+  let fromInput = (input): t => {
     input
     ->Js.String2.trim
     ->Js.String2.split("\n")
@@ -33,32 +34,33 @@ module Graph = {
     ->E.fromArray;
   };
 
-  let nodes = E.keysToArray;
+  let nodes = g => g->E.keysToArray->V.fromArray;
 
-  let dfs = (edges, startNode): vertices => {
+  let neighbors = (g, v) => E.getExn(g, v)->V.fromArray;
+
+  let dfs = (g, startNode): vertices => {
     let rec visit = (curNode, visited: vertices) => {
-      // Js.log(curNode);
-      let neighbors = E.getExn(edges, curNode);
-      neighbors->Belt.Array.reduce(
-        V.add(visited, curNode), (visited, nextNode) => {
-        V.has(visited, nextNode) ? visited : visit(nextNode, visited)
-      });
+      g
+      ->neighbors(curNode)
+      ->V.reduce(V.add(visited, curNode), (visited, nextNode) => {
+          V.has(visited, nextNode) ? visited : visit(nextNode, visited)
+        });
     };
 
     visit(startNode, V.empty);
   };
 
-  let groups = (edges): list(vertices) => {
+  let groups = (g): list(vertices) => {
     let rec visitAll = (unvisited: vertices): list(vertices) => {
       switch (unvisited->V.toList) {
       | [] => []
       | [u, ..._] =>
-        let visited = dfs(edges, u);
+        let visited = dfs(g, u);
         [visited, ...visitAll(unvisited->V.removeMany(visited->V.toArray))];
       };
     };
 
-    let unvisited = edges->nodes->V.fromArray;
+    let unvisited = g->nodes;
     visitAll(unvisited);
   };
 };

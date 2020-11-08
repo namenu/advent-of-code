@@ -55,3 +55,15 @@ module Array = {
 
   include Belt.Array;
 };
+
+module String = {
+  type t = string;
+
+  let charCode = s => {
+    int_of_float(Js.String2.charCodeAt(s, 0));
+  };
+
+  [@bs.val] external parseInt: (t, ~radix: int=?) => int = "parseInt";
+
+  [@bs.send] external padStart: (t, int, t) => t = "padStart";
+};
