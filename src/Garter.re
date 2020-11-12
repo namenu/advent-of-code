@@ -67,3 +67,8 @@ module String = {
 
   [@bs.send] external padStart: (t, int, t) => t = "padStart";
 };
+
+module Pair = {
+  let first = ((first, _)) => first;
+  let second = ((_, second)) => second;
+};
