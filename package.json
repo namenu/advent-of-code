@@ -11,6 +11,6 @@
     "bs-let": "^0.1.16"
   },
   "devDependencies": {
-    "bs-platform": "^8.3.0"
+    "bs-platform": "^8.3.3"
   }
 }
