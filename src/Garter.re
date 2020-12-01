@@ -14,6 +14,13 @@ module List = {
     | None => raise(Not_found)
     };
   };
+
+  let rec orderedPairs = xs => {
+    switch (xs) {
+    | [] => []
+    | [x, ...ys] => Belt.List.map(ys, y => (x, y)) @ orderedPairs(ys)
+    };
+  };
 };
 
 module Array = {
@@ -32,6 +39,11 @@ module Array = {
       },
     );
     state;
+  };
+
+  let max = xs => {
+    let res = Belt.Array.getUnsafe(xs, 0);
+    Belt.Array.reduce(xs, res, (x, res) => max(x, res));
   };
 
   /** Returns (max_value, index). Array may not be empty. */
