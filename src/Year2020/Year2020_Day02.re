@@ -5,8 +5,6 @@ let sampleInput = "1-3 a: abcde
 2-9 c: ccccccccc";
 let input = Node.Fs.readFileAsUtf8Sync("input/year2020/day02.in");
 
-let splitByLines = Js.String.split("\n");
-
 type policy = {
   low: int,
   high: int,
@@ -14,7 +12,7 @@ type policy = {
 };
 
 let parse = line => {
-  let%Opt res = Js.Re.exec_([%re "/(\d+)-(\d+) (\w+): (\w+)/"], line);
+  let%Opt res = Js.Re.exec_([%re "/(\\d+)-(\\d+) (\\w+): (\\w+)/"], line);
   let matches = Js.Re.captures(res)->Array.map(Js.Nullable.toOption);
 
   let%Opt low = matches->Array.getUnsafe(1);
@@ -51,7 +49,7 @@ let validator2 = (({low, high, letter}, password)) => {
 };
 
 // input
-// ->splitByLines
+// ->Util.splitByLines
 // ->Array.keepMap(parse)
 // ->Array.keep(validator2)
 // ->Array.length
