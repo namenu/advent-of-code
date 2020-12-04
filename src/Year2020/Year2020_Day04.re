@@ -176,8 +176,6 @@ module ValidPassport = {
   };
 
   let make = (p: Passport.t) => {
-    p->Js.log;
-
     {
       byr: p.byr->Option.flatMap(parseByr),
       iyr: p.iyr->Option.flatMap(parseIyr),
@@ -206,7 +204,9 @@ let part1 = input => {
   ->Array.keep(Passport.validate)
   ->Array.length;
 };
-// part1(input)->Js.log;
+
+assert(part1(sampleInput) == 2);
+part1(input)->Js.log;
 
 let part2 = input => {
   input
@@ -228,6 +228,7 @@ eyr:2029 ecl:blu cid:129 byr:1989 iyr:2014 pid:896056539 hcl:#a97842 hgt:165cm
 hcl:#888785 hgt:164cm byr:2001 iyr:2015 cid:88 pid:545766238 ecl:hzl eyr:2022
 iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
 
-// part2(invalidSamples)->Js.log;
-// part2(validSamples)->Js.log;
-// part2(input)->Js.log;
+assert(part2(invalidSamples) == 0);
+assert(part2(validSamples) == 4);
+assert(part2(sampleInput) == 2);
+part2(input)->Js.log;
