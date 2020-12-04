@@ -10,7 +10,8 @@
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
-    "bs-bastet"
+    "bs-bastet",
+    "@namenu/garter"
   ],
   "bsc-flags": [],
   "ppx-flags": ["bs-let/ppx"],
