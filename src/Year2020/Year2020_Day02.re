@@ -48,9 +48,11 @@ let validator2 = (({low, high, letter}, password)) => {
   };
 };
 
-// input
-// ->Util.splitByLines
-// ->Array.keepMap(parse)
-// ->Array.keep(validator2)
-// ->Array.length
-// ->Js.log;
+let part2 = input => {
+  input
+  ->Util.splitLines
+  ->Array.keepMap(parse)
+  ->Array.keep(validator2)
+  ->Array.length
+  ->Js.log;
+};

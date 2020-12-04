@@ -21,7 +21,7 @@ module Area = {
   };
 
   let make = input => {
-    let area = input->Util.splitByLines->Array.map(Garter.String.toArray);
+    let area = input->Util.splitLines->Array.map(Garter.String.toArray);
     let width = area->Array.getUnsafe(0)->Array.length;
     let height = area->Array.length;
 

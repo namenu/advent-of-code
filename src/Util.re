@@ -10,4 +10,4 @@ let benchmark = f => {
 [@bs.module "console"] external consoledir: ('obj, 'option) => unit = "dir";
 let clog = o => consoledir(o, {"depth": "null"});
 
-let splitByLines = Js.String.split("\n");
+let splitLines = Js.String.split("\n");
