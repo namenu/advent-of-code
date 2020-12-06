@@ -27,11 +27,9 @@ module GroupAnswers = {
   let make = (xs: array(string)): t =>
     xs->Array.map(x => x->Garter.String.toArray->Answers.fromArray);
 
-  let everyAnswers = (xs: t) =>
-    xs->Array.reduce(xs->Array.getUnsafe(0), Answers.union);
+  let everyAnswers = Garter.Array.reduce1(_, Answers.union);
 
-  let commonAnswers = (xs: t) =>
-    xs->Array.reduce(xs->Array.getUnsafe(0), Answers.intersect);
+  let commonAnswers = Garter.Array.reduce1(_, Answers.intersect);
 
   let sum = (xs: t): int =>
     xs->Array.map(Answers.size)->Array.reduce(0, (+));
