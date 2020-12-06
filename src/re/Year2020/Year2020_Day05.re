@@ -18,9 +18,18 @@ let toBinary = s => {
   ->Garter.Int.fromStringWithRadix(~radix=2);
 };
 
-sampleInput->toBinary->Js.log;
+assert(sampleInput->toBinary == 357);
 assert(toBinary("BFFFBBFRRR") == 567);
 assert(toBinary("FFFBBBFRRR") == 119);
 assert(toBinary("BBFFBBFRLL") == 820);
 
-input->Util.splitLines->Array.map(toBinary)->Garter.Array.max->Js.log;
+let seats = input->Util.splitLines->Array.map(toBinary);
+
+// part1
+seats->Garter.Array.max->Js.log;
+
+// part2
+seats
+->Garter.Array.Int.groupBy(~keyFn=x => x lsr 3)
+->Map.Int.keep((_, v) => Array.length(v) < 8)
+->Js.log;
