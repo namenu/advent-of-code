@@ -1,7 +1,7 @@
 {
-  "name": "aoc-2017-reason",
+  "name": "advent-of-reason",
   "sources": {
-    "dir" : "src",
+    "dir" : "src/re",
     "subdirs" : true
   },
   "package-specs": {
