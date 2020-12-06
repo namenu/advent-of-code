@@ -12,15 +12,4 @@ let clog = o => consoledir(o, {"depth": "null"});
 
 let splitLines = s => s->Js.String2.trim->Js.String2.split("\n");
 
-let splitParagraphs = input => {
-  splitLines(input)
-  ->List.fromArray
-  ->Garter.List.partitionBy(x => Js.String2.length(x) == 0)
-  ->List.keepMap(xs =>
-      switch (xs) {
-      | [""] => None
-      | l => Some(l->List.toArray)
-      }
-    )
-  ->List.toArray;
-};
+let splitParagraphs = s => s->Js.String2.trim->Js.String2.split("\n\n");

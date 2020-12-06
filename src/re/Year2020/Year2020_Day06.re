@@ -1,21 +1,6 @@
 open Belt;
 
-let sampleInput = "abc
-
-a
-b
-c
-
-ab
-ac
-
-a
-a
-a
-a
-
-b
-";
+let sampleInput = "abc\n\na\nb\nc\n\n\nab\nac\n\na\na\na\na\n\nb\n";
 
 let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day06.in");
 
@@ -38,6 +23,7 @@ module GroupAnswers = {
 let part1 = input => {
   input
   ->Util.splitParagraphs
+  ->Array.map(Util.splitLines)
   ->Array.map(p => p->GroupAnswers.make->GroupAnswers.everyAnswers)
   ->GroupAnswers.sum
   ->Js.log;
@@ -49,6 +35,7 @@ input->part1;
 let part2 = input => {
   input
   ->Util.splitParagraphs
+  ->Array.map(Util.splitLines)
   ->Array.map(p => p->GroupAnswers.make->GroupAnswers.commonAnswers)
   ->GroupAnswers.sum
   ->Js.log;
