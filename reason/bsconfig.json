@@ -1,0 +1,22 @@
+{
+  "name": "aoc-2017-reason",
+  "sources": {
+    "dir" : "src",
+    "subdirs" : true
+  },
+  "package-specs": {
+    "module": "commonjs",
+    "in-source": true
+  },
+  "suffix": ".bs.js",
+  "bs-dependencies": [
+    "bs-bastet",
+    "@namenu/garter"
+  ],
+  "bsc-flags": [],
+  "ppx-flags": ["bs-let/ppx"],
+  "warnings": {
+    "error" : "+101"
+  },
+  "refmt": 3
+}
