@@ -2,7 +2,7 @@ open Belt;
 
 let input = {
   let lines =
-    Node_fs.readFileAsUtf8Sync("input/day02.in")
+    Node_fs.readFileAsUtf8Sync("resources/year2017/day02.in")
     ->Js.String2.trim
     ->Js.String2.split("\n");
   let parseInts = line =>

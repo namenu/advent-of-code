@@ -74,7 +74,7 @@ let parse = s => {
   };
 };
 
-let input = Node_fs.readFileAsUtf8Sync("input/day16.in")->Js.String2.trim;
+let input = Node_fs.readFileAsUtf8Sync("resources/year2017/day16.in")->Js.String2.trim;
 let sampleInput = "s1,x3/4,pe/b";
 
 let part1 = (s, input) => {

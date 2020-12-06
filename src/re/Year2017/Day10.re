@@ -1,6 +1,6 @@
 open Belt;
 
-let input = Node.Fs.readFileAsUtf8Sync("input/day10.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2017/day10.in");
 
 let part1 = () => {
   let seq =

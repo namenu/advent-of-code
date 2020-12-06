@@ -33,7 +33,7 @@ module Maze = {
 };
 
 let input =
-  Node_fs.readFileAsUtf8Sync("input/day05.in")
+  Node_fs.readFileAsUtf8Sync("resources/year2017/day05.in")
   ->Js.String2.trim
   ->Js.String2.split("\n")
   ->Array.map(int_of_string);

@@ -1,6 +1,6 @@
 open Belt;
 
-let input = Node_fs.readFileSync("input/day01.in", `utf8);
+let input = Node_fs.readFileSync("resources/year2017/day01.in", `utf8);
 
 let list_of_digits = input =>
   Js.String.castToArrayLike(input)

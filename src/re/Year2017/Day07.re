@@ -30,7 +30,7 @@ module Program = {
 };
 
 let programs =
-  Node_fs.readFileAsUtf8Sync("input/day07.in")
+  Node_fs.readFileAsUtf8Sync("resources/year2017/day07.in")
   ->Js.String2.trim
   ->Js.String2.split("\n")
   ->Array.map(Program.fromString);

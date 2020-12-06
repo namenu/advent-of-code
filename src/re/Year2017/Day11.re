@@ -73,7 +73,7 @@ assert(part1("ne,ne,sw,sw") == 0);
 assert(part1("ne,ne,s,s") == 2);
 assert(part1("se,sw,se,sw,sw") == 3);
 
-let input = Node.Fs.readFileAsUtf8Sync("input/day11.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2017/day11.in");
 part1(input)->Js.log;
 
 let part2 = input => {

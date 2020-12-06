@@ -3,7 +3,7 @@ open Belt
 let sampleInput = [1721, 979, 366, 299, 675, 1456]
 
 let readInput = () => {
-  let input = Node_fs.readFileAsUtf8Sync("input/year2020/day01.in")
+  let input = Node_fs.readFileAsUtf8Sync("resources/year2020/day01.in")
   input->Js.String2.split("\n")->Array.map(int_of_string)
 }
 

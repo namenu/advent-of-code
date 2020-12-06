@@ -33,7 +33,7 @@ module Walls = {
   };
 };
 
-let input = Node.Fs.readFileAsUtf8Sync("input/day13.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2017/day13.in");
 let w = Walls.fromString(input);
 
 let part1 = () => Walls.severity(w)->Js.log;

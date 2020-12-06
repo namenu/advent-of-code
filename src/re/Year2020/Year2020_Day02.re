@@ -3,7 +3,7 @@ open Belt;
 let sampleInput = "1-3 a: abcde
 1-3 b: cdefg
 2-9 c: ccccccccc";
-let input = Node.Fs.readFileAsUtf8Sync("input/year2020/day02.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day02.in");
 
 type policy = {
   low: int,

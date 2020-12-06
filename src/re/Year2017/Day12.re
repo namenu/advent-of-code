@@ -5,7 +5,7 @@ let sampleInput = "0 <-> 2
 4 <-> 2, 3, 6
 5 <-> 6
 6 <-> 4, 5";
-let input = Node_fs.readFileAsUtf8Sync("input/day12.in");
+let input = Node_fs.readFileAsUtf8Sync("resources/year2017/day12.in");
 
 let parse = s => {
   let%Opt res = [%re "/(\\d+) <-> (.*)/"]->Js.Re.exec_(s);

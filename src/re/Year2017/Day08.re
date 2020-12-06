@@ -65,7 +65,7 @@ module Cpu = {
     Map.String.valuesToArray(cpu.registers)->Js.Math.maxMany_int;
 };
 
-let input = Node_fs.readFileAsUtf8Sync("input/day08.in");
+let input = Node_fs.readFileAsUtf8Sync("resources/year2017/day08.in");
 let insts = input->Js.String2.split("\n")->Array.map(Instruction.fromString);
 
 let part1 = () => {

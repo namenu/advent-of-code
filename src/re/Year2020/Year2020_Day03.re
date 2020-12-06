@@ -11,7 +11,7 @@ let sampleInput = "..##.......
 #.##...#...
 #...##....#
 .#..#...#.#";
-let input = Node.Fs.readFileAsUtf8Sync("input/year2020/day03.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day03.in");
 
 module Area = {
   type t = {

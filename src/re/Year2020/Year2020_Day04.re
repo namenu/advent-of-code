@@ -5,23 +5,22 @@ iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929
 hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in";
 
-let input = Node.Fs.readFileAsUtf8Sync("input/year2020/day04.in");
+let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day04.in");
 
 module Passport = {
   type t = {
-    byr: option(string),
-    iyr: option(string),
-    eyr: option(string),
-    hgt: option(string),
-    hcl: option(string),
-    ecl: option(string),
-    pid: option(string),
+    byr: string,
+    iyr: string,
+    eyr: string,
+    hgt: string,
+    hcl: string,
+    ecl: string,
+    pid: string,
     cid: option(string),
   };
 
   let make = s => {
     let tokens = Js.String2.split(s, " ");
-
     let kv =
       tokens
       ->Array.map(token => {
@@ -30,32 +29,20 @@ module Passport = {
         })
       ->Map.String.fromArray;
 
-    {
-      byr: kv->Map.String.get("byr"),
-      iyr: kv->Map.String.get("iyr"),
-      eyr: kv->Map.String.get("eyr"),
-      hgt: kv->Map.String.get("hgt"),
-      hcl: kv->Map.String.get("hcl"),
-      ecl: kv->Map.String.get("ecl"),
-      pid: kv->Map.String.get("pid"),
-      cid: kv->Map.String.get("cid"),
-    };
-  };
+    let%Opt byr = kv->Map.String.get("byr");
+    let%Opt iyr = kv->Map.String.get("iyr");
+    let%Opt eyr = kv->Map.String.get("eyr");
+    let%Opt hgt = kv->Map.String.get("hgt");
+    let%Opt hcl = kv->Map.String.get("hcl");
+    let%Opt ecl = kv->Map.String.get("ecl");
+    let%Opt pid = kv->Map.String.get("pid");
+    let cid = kv->Map.String.get("cid");
 
-  let validate = ({byr, iyr, eyr, hgt, hcl, ecl, pid, cid}) => {
-    switch (byr, iyr, eyr, hgt, hcl, ecl, pid, cid) {
-    | (Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) =>
-      true
-    | _ => false
-    };
+    Some({byr, iyr, eyr, hgt, hcl, ecl, pid, cid});
   };
 };
 
 module ValidPassport = {
-  type height =
-    | In(int)
-    | Cm(int);
-
   type token =
     | BirthYear(int)
     | IssueYear(int)
@@ -64,16 +51,19 @@ module ValidPassport = {
     | HairColor(string)
     | EyeColor(string)
     | PassportId(string)
-    | CountryId(string);
+    | CountryId(string)
+  and height =
+    | In(int)
+    | Cm(int);
 
   type t = {
-    byr: option(token),
-    iyr: option(token),
-    eyr: option(token),
-    hgt: option(token),
-    hcl: option(token),
-    ecl: option(token),
-    pid: option(token),
+    byr: token,
+    iyr: token,
+    eyr: token,
+    hgt: token,
+    hcl: token,
+    ecl: token,
+    pid: token,
     cid: option(token),
   };
 
@@ -176,33 +166,20 @@ module ValidPassport = {
   };
 
   let make = (p: Passport.t) => {
-    {
-      byr: p.byr->Option.flatMap(parseByr),
-      iyr: p.iyr->Option.flatMap(parseIyr),
-      eyr: p.eyr->Option.flatMap(parseEyr),
-      hgt: p.hgt->Option.flatMap(parseHgt),
-      hcl: p.hcl->Option.flatMap(parseHcl),
-      ecl: p.ecl->Option.flatMap(parseEcl),
-      pid: p.pid->Option.flatMap(parsePid),
-      cid: p.cid->Option.map(x => CountryId(x)),
-    };
-  };
-
-  let validate = ({byr, iyr, eyr, hgt, hcl, ecl, pid, cid}) => {
-    switch (byr, iyr, eyr, hgt, hcl, ecl, pid, cid) {
-    | (Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _) =>
-      true
-    | _ => false
-    };
+    let%Opt byr = p.byr->parseByr;
+    let%Opt iyr = p.iyr->parseIyr;
+    let%Opt eyr = p.eyr->parseEyr;
+    let%Opt hgt = p.hgt->parseHgt;
+    let%Opt hcl = p.hcl->parseHcl;
+    let%Opt ecl = p.ecl->parseEcl;
+    let%Opt pid = p.pid->parsePid;
+    let cid = p.cid->Option.map(x => CountryId(x));
+    Some({byr, iyr, eyr, hgt, hcl, ecl, pid, cid});
   };
 };
 
 let part1 = input => {
-  input
-  ->Util.splitLines
-  ->Array.map(Passport.make)
-  ->Array.keep(Passport.validate)
-  ->Array.length;
+  input->Util.splitLines->Array.keepMap(Passport.make)->Array.length;
 };
 
 assert(part1(sampleInput) == 2);
@@ -211,10 +188,8 @@ part1(input)->Js.log;
 let part2 = input => {
   input
   ->Util.splitLines
-  ->Array.map(Passport.make)
-  ->Array.keep(Passport.validate)
-  ->Array.map(ValidPassport.make)
-  ->Array.keep(ValidPassport.validate)
+  ->Array.keepMap(Passport.make)
+  ->Array.keepMap(ValidPassport.make)
   ->Array.length;
 };
 
