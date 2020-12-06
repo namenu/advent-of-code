@@ -7,6 +7,7 @@
     "watch": "bsb -make-world -w"
   },
   "dependencies": {
+    "@namenu/garter": "file:./packages/@namenu/garter",
     "bs-bastet": "^1.2.5",
     "bs-let": "^0.1.16"
   },

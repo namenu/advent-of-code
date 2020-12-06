@@ -2,6 +2,9 @@
 # yarn lockfile v1
 
 
+"@namenu/garter@file:./packages/@namenu/garter":
+  version "0.1.0"
+
 bisect_ppx@^2.1.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/bisect_ppx/-/bisect_ppx-2.5.0.tgz#3f667c49f7c1f08a2676d7062a1b31b745868bcb"
