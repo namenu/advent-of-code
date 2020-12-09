@@ -3,7 +3,7 @@ open Belt;
 let sampleInput = "1-3 a: abcde
 1-3 b: cdefg
 2-9 c: ccccccccc";
-let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day02.in");
+let input = Util.readInput(~year=2020, ~day=2);
 
 type policy = {
   low: int,
@@ -28,10 +28,9 @@ let parse = line => {
 
 let validator1 = (({low, high, letter}, password)) => {
   let freq =
-    Garter.Array.frequencies(
-      password->Garter.String.toArray,
-      ~id=(module Garter.Id.StringComparable),
-    );
+    password
+    ->Garter.String.toArray
+    ->Garter.Array.frequencies(~id=(module Garter.Id.StringComparable));
   switch (freq->Belt.Map.get(letter)) {
   | Some(f) when f >= low && f <= high => true
   | _ => false
@@ -56,3 +55,6 @@ let part2 = input => {
   ->Array.length
   ->Js.log;
 };
+
+part2(sampleInput);
+part2(input);

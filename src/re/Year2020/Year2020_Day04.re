@@ -5,7 +5,7 @@ iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929
 hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in";
 
-let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day04.in");
+let input = Util.readInput(~year=2020, ~day=4)
 
 module Passport = {
   type t = {

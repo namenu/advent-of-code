@@ -1,12 +1,11 @@
 open Belt;
 
 let sampleInput = "abc\n\na\nb\nc\n\n\nab\nac\n\na\na\na\na\n\nb\n";
-
-let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day06.in");
-
-module Answers = Set.String;
+let input = Util.readInput(~year=2020, ~day=6);
 
 module GroupAnswers = {
+  module Answers = Set.String;
+
   type t = array(Answers.t);
 
   let make = (xs: array(string)): t =>

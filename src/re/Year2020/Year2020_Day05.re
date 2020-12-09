@@ -2,7 +2,7 @@ open Belt;
 
 let sampleInput = "FBFBBFFRLR";
 
-let input = Node.Fs.readFileAsUtf8Sync("resources/year2020/day05.in");
+let input = Util.readInput(~year=2020, ~day=5)
 
 let toBinary = s => {
   s
