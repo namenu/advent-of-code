@@ -2,19 +2,6 @@
 'use strict';
 
 
-function first(param) {
-  return param[0];
-}
-
-function second(param) {
-  return param[1];
-}
-
-var Pair = {
-  first: first,
-  second: second
-};
-
 var $$Array;
 
 var Id;
@@ -39,5 +26,4 @@ exports.Obj = Obj;
 exports.Vector = Vector;
 exports.Queue = Queue;
 exports.$$String = $$String;
-exports.Pair = Pair;
 /* No side effect */

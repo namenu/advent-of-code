@@ -13,9 +13,3 @@ module Vector = Garter_Vector;
 module Queue = Garter_Queue;
 
 module String = Garter_String;
-
-module Pair = {
-  let first = ((first, _)) => first;
-  let second = ((_, second)) => second;
-};
-

@@ -42,7 +42,7 @@ module Programs = {
 
   let toString = t => {
     Belt.SortArray.stableSortBy(t, ((_, i), (_, j)) => i - j)
-    ->Belt.Array.map(Garter.Pair.first)
+    ->Belt.Array.map(fst)
     ->Js.Array2.joinWith("");
   };
 

@@ -1,21 +1,5 @@
 open Garter;
 
-module XMAS = {
-  type t = {
-    q: Queue.t(float),
-    rest: list(float),
-  };
-
-  let make = (data, ~preamble) => {
-    let (header, body) = List.splitAt(data, preamble);
-    let init = {q: Queue.empty, rest: body};
-
-    header->List.reduce(init, ({q} as state, v) =>
-      {...state, q: Queue.snoc(q, v)}
-    );
-  };
-};
-
 let sampleInput = "35\n20\n15\n25\n47\n40\n62\n55\n65\n95\n102\n117\n150\n182\n127\n219\n299\n277\n309\n576";
 let input = Util.readInput(~year=2020, ~day=09);
 
@@ -32,9 +16,51 @@ let part1 = (input, preamble) => {
   Array.zip(chunks, targets)
   ->Array.keep(isInvalidChunk)
   ->Array.getUnsafe(0)
-  ->Garter.Pair.second
+  ->snd
   ->Js.log;
 };
 
 // part1(sampleInput, 5);
-part1(input, 25);
+// part1(input, 25);
+
+type state = {
+  range: (int, int),
+  sum: float,
+};
+
+let findWeakness = (data, target) => {
+  let next = ({range, sum} as state) => {
+    let (i, j) = range;
+    if (sum == target) {
+      Ok(state);
+    } else if (state.sum < target) {
+      Error({sum: sum +. data->Array.getUnsafe(j), range: (i, j + 1)});
+    } else {
+      Error({sum: sum -. data->Array.getUnsafe(i), range: (i + 1, j)});
+    };
+  };
+  let rec iter = state => {
+    switch (next(state)) {
+    | Ok(state') => state'
+    | Error(state') => iter(state')
+    };
+  };
+  iter({range: (0, 0), sum: 0.0});
+};
+
+let part2 = (input, target) => {
+  let data = input->Util.splitLines->Array.map(float_of_string);
+  let (i, j) = data->findWeakness(target).range;
+
+  let set =
+    Array.slice(data, ~offset=i, ~len=j - i)
+    ->Belt.Set.fromArray(~id=(module Garter.Id.FloatComparable));
+
+  let%Opt min = set->Belt.Set.minimum;
+  let%Opt max = set->Belt.Set.maximum;
+  (min +. max)->Js.log;
+  None;
+};
+
+// part2(sampleInput, 127.0);
+// part2(input, 144381670.0);
