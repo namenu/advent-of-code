@@ -56,10 +56,11 @@ let part2 = (input, target) => {
     Array.slice(data, ~offset=i, ~len=j - i)
     ->Belt.Set.fromArray(~id=(module Garter.Id.FloatComparable));
 
-  let%Opt min = set->Belt.Set.minimum;
-  let%Opt max = set->Belt.Set.maximum;
-  (min +. max)->Js.log;
-  None;
+  let answer =
+    BsBastet.Option.Infix.(
+      Some((+.)) <*> set->Belt.Set.minimum <*> set->Belt.Set.maximum
+    );
+  answer->Js.log;
 };
 
 // part2(sampleInput, 127.0);
