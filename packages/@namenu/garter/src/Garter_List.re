@@ -1,3 +1,5 @@
+include Belt.List;
+
 let isEmpty = xs => Belt.List.length(xs) === 0;
 
 let takeExn = (list, cnt) => {
@@ -13,6 +15,8 @@ let dropExn = (list, cnt) => {
   | None => raise(Not_found)
   };
 };
+
+let splitAt = (list, n) => (takeExn(list, n), dropExn(list, n));
 
 let rec orderedPairs = xs => {
   switch (xs) {

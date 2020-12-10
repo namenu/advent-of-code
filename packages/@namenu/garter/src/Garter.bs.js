@@ -27,6 +27,8 @@ var Obj;
 
 var Vector;
 
+var Queue;
+
 var $$String;
 
 exports.$$Array = $$Array;
@@ -35,6 +37,7 @@ exports.Int = Int;
 exports.List = List;
 exports.Obj = Obj;
 exports.Vector = Vector;
+exports.Queue = Queue;
 exports.$$String = $$String;
 exports.Pair = Pair;
 /* No side effect */

@@ -10,6 +10,8 @@ module Obj = Garter_Obj;
 
 module Vector = Garter_Vector;
 
+module Queue = Garter_Queue;
+
 module String = Garter_String;
 
 module Pair = {
@@ -17,4 +19,3 @@ module Pair = {
   let second = ((_, second)) => second;
 };
 
-module Queue = Garter_Queue;

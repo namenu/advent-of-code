@@ -1,4 +1,4 @@
-open Belt.Array;
+include Belt.Array;
 
 let isEmpty = xs => length(xs) === 0;
 
@@ -100,4 +100,15 @@ let reduce1 = (xs, f) => {
     r := f(r^, xs->Belt.Array.getUnsafe(i));
   };
   r^;
+};
+
+let windows = (xs, ~n: int, ~step=n, ()) => {
+  let len = size(xs);
+  let rec iter = i =>
+    if (i > len - n) {
+      [];
+    } else {
+      [xs->slice(~offset=i, ~len=n), ...iter(i + step)];
+    };
+  iter(0)->Belt.List.toArray;
 };

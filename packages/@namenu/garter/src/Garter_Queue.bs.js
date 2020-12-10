@@ -3,6 +3,7 @@
 
 var Belt_List = require("bs-platform/lib/js/belt_List.js");
 var Garter_List = require("./Garter_List.bs.js");
+var Caml_js_exceptions = require("bs-platform/lib/js/caml_js_exceptions.js");
 
 function isEmpty(param) {
   return Garter_List.isEmpty(param[0]);
@@ -54,6 +55,25 @@ function tail(param) {
       };
 }
 
+function toList(q) {
+  var f = function (q) {
+    try {
+      return {
+              hd: head(q),
+              tl: f(tail(q))
+            };
+    }
+    catch (raw_exn){
+      var exn = Caml_js_exceptions.internalToOCamlException(raw_exn);
+      if (exn.RE_EXN_ID === "Not_found") {
+        return /* [] */0;
+      }
+      throw exn;
+    }
+  };
+  return f(q);
+}
+
 var empty = [
   /* [] */0,
   /* [] */0
@@ -64,4 +84,5 @@ exports.isEmpty = isEmpty;
 exports.snoc = snoc;
 exports.head = head;
 exports.tail = tail;
+exports.toList = toList;
 /* No side effect */

@@ -2,6 +2,7 @@
 'use strict';
 
 var Belt_Id = require("bs-platform/lib/js/belt_Id.js");
+var Caml_obj = require("bs-platform/lib/js/caml_obj.js");
 
 function cmp(a, b) {
   return a.localeCompare(b) | 0;
@@ -19,6 +20,13 @@ var IntComparable = Belt_Id.MakeComparableU({
       cmp: cmp$1
     });
 
+var cmp$2 = Caml_obj.caml_compare;
+
+var FloatComparable = Belt_Id.MakeComparableU({
+      cmp: cmp$2
+    });
+
 exports.StringComparable = StringComparable;
 exports.IntComparable = IntComparable;
+exports.FloatComparable = FloatComparable;
 /* StringComparable Not a pure module */
