@@ -7,7 +7,8 @@
     "watch": "bsb -make-world -w"
   },
   "dependencies": {
-    "@namenu/garter": "file:./packages/@namenu/garter",
+    "@namenu/garter": "git+ssh://git@github.com/namenu/garter",
+    "@namenu/garter-vector": "git+ssh://git@github.com/namenu/garter-vector",
     "bs-bastet": "^1.2.5",
     "bs-let": "^0.1.16"
   },

@@ -1,36 +1,42 @@
-open Belt
+open Garter
 
-let sampleInput = [1721, 979, 366, 299, 675, 1456]
+let sampleInput = [1721, 979, 366, 299, 675, 1456]->Vector.fromArray
 
-let input = Util.readInput(~year=2020, ~day=1)->Util.splitLines->Array.map(int_of_string)
+let input =
+  Util.readInput(~year=2020, ~day=1)->Util.splitLines->Array.map(int_of_string)->Vector.fromArray
 
 let findPairs = (input, ~sum) => {
-  let nums = input->Set.fromArray(~id=module(Garter.Id.FloatComparable))
+  let nums = input->Set.fromVector(~id=module(Garter.Id.FloatComparable))
   let lut = Set.has(nums)
-  nums->Set.keep(x => lut(sum -. x))->Set.toArray->Array.map(x => (x, sum -. x))
+  nums->Set.keep(x => lut(sum -. x))->Set.toVector->Vector.map(x => (x, sum -. x))
 }
 
-let part1 = input => {
-  findPairs(input, ~sum=2020.0)->Array.map(((x, y)) => x *. y)->Garter.Array.max->Js.log
+let part1 = (input: Vector.t<int>) => {
+  let input = input->Vector.map(float_of_int)
+  let answer = findPairs(input, ~sum=2020.0)->Vector.map(((x, y)) => x *. y)->Vector.max
+  answer->int_of_float
 }
 
-let part2 = input => {
-  let numPairs = input->List.fromArray->Garter.List.orderedPairs
-  let lut = numPairs->List.reduce(Map.Int.empty, (res, (x, y)) => {
+let part2 = (input: Vector.t<int>) => {
+  let numPairs = input->List.fromVector->Garter.List.orderedPairs
+  let lut = numPairs->List.reduce(Belt.Map.Int.empty, (res, (x, y)) => {
     let (sum, mult) = (x + y, x * y)
-    switch res->Map.Int.get(sum) {
-    | Some(m) => mult > m ? res->Map.Int.set(sum, mult) : res
-    | None => res->Map.Int.set(sum, mult)
+    switch res->Belt.Map.Int.get(sum) {
+    | Some(m) => mult > m ? res->Belt.Map.Int.set(sum, mult) : res
+    | None => res->Belt.Map.Int.set(sum, mult)
     }
   })
 
-  Array.keep(input, x => {
-    Map.Int.has(lut, 2020 - x)
-  })->Array.map(x => x * Map.Int.getExn(lut, 2020 - x))->Garter.Array.max->Js.log
+  input
+  ->Vector.keep(x => {
+    Belt.Map.Int.has(lut, 2020 - x)
+  })
+  ->Vector.map(x => x * Belt.Map.Int.getExn(lut, 2020 - x))
+  ->Vector.max
 }
 
-// input->part1->Js.log
-// sampleInput->part1->Js.log
+assert (input->part1 == 436404)
+assert (sampleInput->part1 == 514579)
 
-// input->part2->Js.log
-// sampleInput->part2->Js.log
+assert (input->part2 == 274879808)
+assert (sampleInput->part2 == 241861950)

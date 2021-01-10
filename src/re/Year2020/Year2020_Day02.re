@@ -1,4 +1,4 @@
-open Belt;
+open Garter;
 
 let sampleInput = "1-3 a: abcde
 1-3 b: cdefg
@@ -29,8 +29,8 @@ let parse = line => {
 let validator1 = (({low, high, letter}, password)) => {
   let freq =
     password
-    ->Garter.String.toArray
-    ->Garter.Array.frequencies(~id=(module Garter.Id.StringComparable));
+    ->String.toVector
+    ->Vector.frequencies(~id=(module Id.StringComparable));
   switch (freq->Belt.Map.get(letter)) {
   | Some(f) when f >= low && f <= high => true
   | _ => false
@@ -38,8 +38,8 @@ let validator1 = (({low, high, letter}, password)) => {
 };
 
 let validator2 = (({low, high, letter}, password)) => {
-  let s = password->Garter.String.toArray;
-  let (a, b) = (s->Array.getUnsafe(low - 1), s->Array.getUnsafe(high - 1));
+  let s = password->String.toVector;
+  let (a, b) = (s->Vector.getExn(low - 1), s->Vector.getExn(high - 1));
   switch (a == letter, b == letter) {
   | (true, false)
   | (false, true) => true
@@ -51,10 +51,10 @@ let part2 = input => {
   input
   ->Util.splitLines
   ->Array.keepMap(parse)
-  ->Array.keep(validator2)
-  ->Array.length
-  ->Js.log;
+  ->Vector.fromArray
+  ->Vector.keep(validator2)
+  ->Vector.length;
 };
 
-part2(sampleInput);
-part2(input);
+assert(part2(sampleInput) == 1);
+assert(part2(input) == 588);
