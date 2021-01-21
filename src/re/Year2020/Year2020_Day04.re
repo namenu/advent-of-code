@@ -5,7 +5,7 @@ iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884 hcl:#cfa07d byr:1929
 hcl:#ae17e1 iyr:2013 eyr:2024 ecl:brn pid:760753108 byr:1931 hgt:179cm
 hcl:#cfa07d eyr:2025 pid:166559648 iyr:2011 ecl:brn hgt:59in";
 
-let input = Util.readInput(~year=2020, ~day=4)
+let input = Util.readInput(~year=2020, ~day=4);
 
 module Passport = {
   type t = {
@@ -43,28 +43,35 @@ module Passport = {
 };
 
 module ValidPassport = {
-  type token =
-    | BirthYear(int)
-    | IssueYear(int)
-    | ExpirationYear(int)
-    | Height(height)
-    | HairColor(string)
-    | EyeColor(string)
-    | PassportId(string)
-    | CountryId(string)
-  and height =
+  type byr = int;
+  type iyr = int;
+  type eyr = int;
+  type hgt =
     | In(int)
     | Cm(int);
+  type hcl = string;
+  type ecl = string;
+  type pid = string;
+  type cid = string;
+  type token('t) =
+    | BirthYear(int): token(byr)
+    | IssueYear(int): token(iyr)
+    | ExpirationYear(int): token(eyr)
+    | Height(hgt): token(hgt)
+    | HairColor(string): token(hcl)
+    | EyeColor(string): token(ecl)
+    | PassportId(string): token(pid)
+    | CountryId(string): token(cid);
 
   type t = {
-    byr: token,
-    iyr: token,
-    eyr: token,
-    hgt: token,
-    hcl: token,
-    ecl: token,
-    pid: token,
-    cid: option(token),
+    byr: token(byr),
+    iyr: token(iyr),
+    eyr: token(eyr),
+    hgt: token(hgt),
+    hcl: token(hcl),
+    ecl: token(ecl),
+    pid: token(pid),
+    cid: option(token(cid)),
   };
 
   let parseByr = s => {
@@ -183,7 +190,7 @@ let part1 = input => {
 };
 
 assert(part1(sampleInput) == 2);
-part1(input)->Js.log;
+assert(part1(input) == 222);
 
 let part2 = input => {
   input
@@ -206,4 +213,4 @@ iyr:2010 hgt:158cm hcl:#b6652a ecl:blu byr:1944 eyr:2021 pid:093154719";
 assert(part2(invalidSamples) == 0);
 assert(part2(validSamples) == 4);
 assert(part2(sampleInput) == 2);
-part2(input)->Js.log;
+assert(part2(input) == 140);
