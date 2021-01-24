@@ -1,9 +1,15 @@
 {
   "name": "advent-of-reason",
-  "sources": {
-    "dir": "src/re",
-    "subdirs": true
-  },
+  "sources": [
+    {
+      "dir": "src",
+      "subdirs": true
+    },
+    {
+      "dir": "__tests__",
+      "type": "dev"
+    }
+  ],
   "package-specs": {
     "module": "commonjs",
     "in-source": true
@@ -11,8 +17,11 @@
   "suffix": ".bs.js",
   "bs-dependencies": [
     "@namenu/garter",
-    "@namenu/garter-vector",
+    "re-vector",
     "bs-bastet"
+  ],
+  "bs-dev-dependencies": [
+    "@glennsl/bs-jest"
   ],
   "bsc-flags": [],
   "ppx-flags": [

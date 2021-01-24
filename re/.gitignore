@@ -1,7 +1,7 @@
 .merlin
 .bsb.lock
 npm-debug.log
-/re/lib/bs/
 /node_modules/
-/re/src/**/*.bs.js
+/lib/bs/
+/src/**/*.bs.js
 .nrepl-port

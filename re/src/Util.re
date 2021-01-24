@@ -14,7 +14,11 @@ let splitLines = s => s->Js.String2.trim->Js.String2.split("\n");
 
 let splitParagraphs = s => s->Js.String2.trim->Js.String2.split("\n\n");
 
+[@bs.val]
+external dirname: string = "__dirname";
+
 let readInput = (~year, ~day) => {
   let path = Printf.sprintf({j|resources/year%04d/day%02d.in|j}, year, day);
-  Node_fs.readFileAsUtf8Sync(path);
+  let dir = dirname ++ "/../../"
+  Node_fs.readFileAsUtf8Sync(dir ++ path);
 };

@@ -9,29 +9,27 @@ mem[8] = 0";
 let input = Util.readInput(~year=2020, ~day=14);
 
 type mask = {
-  stencil: BigInt.t,
-  value: BigInt.t,
+  stencil: Int64.t,
+  value: Int64.t,
 };
 
 type op =
   | Mask(mask)
-  | Store(int, BigInt.t);
+  | Store(int, Int64.t);
 
 let parseMask = str => {
-  open! BigInt;
-
   let (stencil, value) =
     str
     ->Garter.String.toVector
     ->V.reduce(
-        (zero, zero),
+        (Int64.zero, Int64.zero),
         ((s, m), ch) => {
-          let s = s lsl one;
-          let m = m lsl one;
+          let s = s->Int64.shift_left(1);
+          let m = m->Int64.shift_left(1);
           switch (ch) {
           | "0" => (s, m)
-          | "1" => (s, m lor one)
-          | _ => (s lor one, m)
+          | "1" => (s, m->Int64.logor(Int64.one))
+          | _ => (s->Int64.logor(Int64.one), m)
           };
         },
       );
@@ -46,7 +44,7 @@ let parseStore = str => {
     ->Option.getUnsafe;
 
   let addr = re[1]->Option.flatMap(Int.fromString)->Option.getExn;
-  let value = re[2]->Option.map(BigInt.fromString)->Option.getExn;
+  let value = re[2]->Option.flatMap(Int64.of_string_opt)->Option.getExn;
   Store(addr, value);
 };
 
@@ -62,7 +60,7 @@ let parse = s => {
 };
 
 module System = {
-  type memory = Map.Int.t(BigInt.t);
+  type memory = Map.Int.t(Int64.t);
   type t = {
     mask,
     memory,
@@ -70,15 +68,14 @@ module System = {
 
   let make = () => {
     mask: {
-      stencil: BigInt.zero,
-      value: BigInt.zero,
+      stencil: Int64.zero,
+      value: Int64.zero,
     },
     memory: Map.Int.empty,
   };
 
   let store = ({mask, memory}, addr, value) => {
-    open! BigInt;
-    let mval = value land mask.stencil lor mask.value;
+    let mval = value->Int64.logand(mask.stencil)->Int64.logor(mask.value);
     {mask, memory: memory->Map.Int.set(addr, mval)};
   };
 
@@ -93,14 +90,18 @@ module System = {
 };
 
 // part1
-System.(
-  {
-    let program = input->Util.splitLines->V.fromArray->V.map(parse);
-    let state1 = System.make()->run(program);
-    state1.memory
-    ->Map.Int.valuesToArray
-    ->V.fromArray
-    ->V.reduce(BigInt.zero, BigInt.(+));
-  }
-)
-->Js.log;
+let part1 = input =>
+  System.(
+    {
+      let program = input->Util.splitLines->V.fromArray->V.map(parse);
+      let state1 = System.make()->run(program);
+      state1.memory
+      ->Map.Int.valuesToArray
+      ->V.fromArray
+      ->V.reduce(Int64.zero, Int64.add)
+      ->Int64.to_float;
+    }
+  );
+
+assert(part1(sampleInput) == 165.0);
+assert(part1(input) == 17765746710228.0);
