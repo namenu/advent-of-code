@@ -27,7 +27,7 @@
          (amplifier amps))
        (apply max,,,)))
 
-(defn get-output [state]
+(defn fetch-output [state]
   (let [output-cnt (count (:output state))]
     (->> (iterate run state)
          (find-first #(or (> (count (:output %)) output-cnt) (halted? %))))))
@@ -37,7 +37,7 @@
          idx   0
          input 0]
     (let [before (add-input (get amps idx) input)
-          after  (get-output before)
+          after  (fetch-output before)
           output (peek (:output after))]
       (if (and (= idx 4) (halted? after))
         output

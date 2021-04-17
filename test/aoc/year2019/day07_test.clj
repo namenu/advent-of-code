@@ -1,8 +1,8 @@
 (ns aoc.year2019.day07-test
-  (:require [aoc.year2019.day07 :refer :all]
+  (:require [aoc.year2019.day07 :refer [max-thruster amplify amplify-fb]]
             [clojure.test :refer :all]))
 
-(deftest part1
+(deftest part1-test
   (let [phases [0 1 2 3 4]]
     (let [program [3, 15, 3, 16, 1002, 16, 10, 16, 1, 16, 15, 15, 4, 15, 99, 0, 0]]
       (is (= 43210 (max-thruster program amplify phases))))
@@ -15,7 +15,7 @@
   )
 
 
-(deftest part2
+(deftest part2-test
   (let [program [3, 26, 1001, 26, -4, 26, 3, 27, 1002, 27, 2, 27, 1, 27, 26, 27, 4, 27, 1001, 28, -1, 28, 1005, 28, 6, 99, 0, 0, 5]]
     (is (= 139629729 (max-thruster program amplify-fb [9 8 7 6 5]))))
 

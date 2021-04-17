@@ -87,3 +87,11 @@
                   (f0 s-next (next s-next)))
                 nil)))]
     (f0 s (next s))))
+
+;; memoize recursive function with Y-combinator
+(defmacro memoize-rec [form]
+  (let [[_fn* fname params & body] form
+        params-with-fname (vec (cons fname params))]
+    `(let [f# (memoize (fn ~params-with-fname
+                         (let [~fname (partial ~fname ~fname)] ~@body)))]
+       (partial f# f#))))
