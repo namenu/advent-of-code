@@ -39,12 +39,8 @@
 (defn worker-available? [workers]
   (< (count workers) *num-workers*))
 
-(defn char->int ^long [c]
-  #?(:clj (int c)
-     :cljs (.charCodeAt c 0)))
-
 (defn schedule [workers task cur-time]
-  (let [duration (+ (- (char->int task) 64) *step-duration*)]
+  (let [duration (+ (- (int task) 64) *step-duration*)]
     (assoc workers task (+ duration cur-time))))
 
 (defn wait-till-available [workers]
@@ -70,25 +66,3 @@
               (recur elapsed (schedule workers task elapsed) (disj todo task) deps)
               (let [[[task time] workers] (wait-till-available workers)]
                 (recur time workers todo (remove-node deps task))))))))))
-
-
-;; tests
-(require '[clojure.test :refer [deftest is run-tests]])
-
-(deftest test-day7
-  (let [input ["Step C must be finished before step A can begin."
-               "Step C must be finished before step F can begin."
-               "Step A must be finished before step B can begin."
-               "Step A must be finished before step D can begin."
-               "Step B must be finished before step E can begin."
-               "Step D must be finished before step E can begin."
-               "Step F must be finished before step E can begin."]]
-    (is (= "CABDFE" (part1 input)))
-    (is (= 15 (part2 input 2 0))))
-
-  (comment
-    (require '[clojure.java.io :as io])
-    (let [input (->> "year2018/day07.in" io/resource io/reader line-seq)]))
-  )
-
-(run-tests)

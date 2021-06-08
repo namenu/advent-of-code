@@ -52,6 +52,11 @@
   (reduce #(if (= %1 %2) (reduced %1) %2)
           (iterate f x)))
 
+(defn iterate-n
+  "get functional power of x. f^n(x)"
+  [f n x]
+  (first (drop n (iterate f x))))
+
 (defn bounding-box [points]
   (let [cols    (apply map vector points)
         min-max (map #(apply (juxt min max) %) cols)]
