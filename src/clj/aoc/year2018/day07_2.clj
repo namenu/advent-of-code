@@ -13,9 +13,13 @@
     (Graph. (set (remove #(= (first %) v) es))
             (disj vs v))))
 
-(defn edges->graph [edges]
-  (Graph. (set edges)
-          (reduce #(apply conj %1 %2) #{} edges)))
+(defn input->graph [input]
+  (let [parse (fn [s]
+                (let [[_ x y] (re-find #"Step (\S) must be finished before step (\S) can begin." s)]
+                  [(get x 0) (get y 0)]))
+        edges (map parse input)]
+    (Graph. (set edges)
+            (reduce #(apply conj %1 %2) #{} edges))))
 
 
 (defn init-state
@@ -57,15 +61,8 @@
       (update :doing disj task)
       (update :done conj task)))
 
-(defn has-todo? [state]
-  (some (fn [[_ workload]]
-          (pos? workload))
-        (:tasks state)))
-
-
-(defn parse [s]
-  (let [[_ x y] (re-find #"Step (\S) must be finished before step (\S) can begin." s)]
-    [(get x 0) (get y 0)]))
+(defn finished? [state]
+  (empty? (:tasks state)))
 
 (defn assign-one
   "idle worker가 있고, 일감이 있으면 => 일감 하나 할당 (실패시 nil)"
@@ -95,43 +92,34 @@
 
 (defn finalize [init-state]
   (->> init-state
-       (iterate #(-> %
-                     assign-all
-                     proceed
-                     cleanup))
-       (find-first (complement has-todo?))))
+       (iterate #(-> % assign-all proceed cleanup))
+       (find-first finished?)))
 
-(defn part1 [lines]
-  (let [g     (edges->graph (map parse lines))
+
+(defn part1 [input]
+  (let [g     (input->graph input)
         order (g/topological-sort g #(apply min-key int %))
         order (-> (init-state g)
                   finalize
                   :done)]
     (apply str order)))
 
-(defn part2 [lines num-workers step-durations]
-  (let [g        (edges->graph (map parse lines))
+(defn part2 [input num-workers step-durations]
+  (let [g        (input->graph input)
         workload (fn [task] (+ (- (int task) 64)
                                step-durations))]
     (-> (init-state g num-workers workload)
         finalize
         :tick)))
 
-(let [input ["Step C must be finished before step A can begin."
-             "Step C must be finished before step F can begin."
-             "Step A must be finished before step B can begin."
-             "Step A must be finished before step D can begin."
-             "Step B must be finished before step E can begin."
-             "Step D must be finished before step E can begin."
-             "Step F must be finished before step E can begin."]]
-  (assert (= (part1 input) "CABDFE"))
 
-
-  ;; part2
-  (part2 input 2 0)
-
-  (part2 (input-lines 2018 7) 5 60)
-
-  (let [g (edges->graph (map parse (input-lines 2018 7)))]
-    (g/topological-sort g #(apply min-key int %)))
-  )
+(comment
+  (let [input ["Step C must be finished before step A can begin."
+               "Step C must be finished before step F can begin."
+               "Step A must be finished before step B can begin."
+               "Step A must be finished before step D can begin."
+               "Step B must be finished before step E can begin."
+               "Step D must be finished before step E can begin."
+               "Step F must be finished before step E can begin."]]
+    (assert (= (part1 input) "CABDFE"))
+    (assert (= (part2 input 2 0) 15))))

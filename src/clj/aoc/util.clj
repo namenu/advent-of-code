@@ -58,6 +58,7 @@
   (first (drop n (iterate f x))))
 
 (defn iterate-while
+  "반복적으로 f를 적용하며 값이 truthy인 마지막 값을 반환"
   [p f x]
   (->> (iterate f x)
        (take-while p)
