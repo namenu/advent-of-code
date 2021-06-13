@@ -54,8 +54,14 @@
 
 (defn iterate-n
   "get functional power of x. f^n(x)"
-  [f n x]
+  [n f x]
   (first (drop n (iterate f x))))
+
+(defn iterate-while
+  [p f x]
+  (->> (iterate f x)
+       (take-while p)
+       last))
 
 (defn bounding-box [points]
   (let [cols    (apply map vector points)

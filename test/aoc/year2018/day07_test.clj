@@ -1,7 +1,7 @@
 (ns aoc.year2018.day07-test
   (:require [clojure.test :refer [deftest testing is]]
             [aoc.year2018.day07 :refer [part1 part2]]
-            [aoc.year2018.day07-2 :refer [part1] :rename {part1 part1-2}]
+            [aoc.year2018.day07-2 :refer [part1 part2] :rename {part1 part1-2 part2 part2-2}]
             [aoc.util :refer [input-lines]]))
 
 (deftest test-day7
@@ -23,8 +23,9 @@
 
     (testing "trial-2"
       (is (= "CABDFE" (part1-2 sample-input)))
-      (is (= "CQSWKZFJONPBEUMXADLYIGVRHT" (part1 (input-lines 2018 7))))
+      (is (= "CQSWKZFJONPBEUMXADLYIGVRHT" (part1-2 (input-lines 2018 7))))
 
-      )))
+      (is (= 15 (part2-2 sample-input 2 0)))
+      (is (= 914 (part2-2 input 5 60))))))
 
 (clojure.test/run-tests)

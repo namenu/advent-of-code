@@ -2,6 +2,19 @@
   (:require [clojure.data.priority-map :refer [priority-map]])
   (:import (clojure.lang PersistentQueue)))
 
+
+(defprotocol IDirectedGraph
+  (edges [g] "Returns all edges #{[u v]*}")
+  (vertices [g] "Returns all vertices #{v*}")
+
+  (remove-vertex [g v]))
+
+(defn topological-tops
+  [^aoc.graph.IDirectedGraph g]
+  (->> (map second (edges g))
+       (apply disj (vertices g))))
+
+
 (defn bfs
   "adjacent-fn :: pos -> [pos]
   Only works for unweighted graph."
