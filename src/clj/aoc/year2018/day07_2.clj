@@ -19,23 +19,19 @@
 
 
 (defn init-state
+  "workload는 task 에 대한 작업량을 계산하는 함수"
   ([g]
-   (init-state g 1 0))
-  ([g num-workers step-durations]
-   (let [workload (fn [task] (+ (- (int task) 64)
-                                step-durations))]
-     {:graph       g
-
-      ;; tasks :: { task-name -> workload }
-      :tasks       (->> (g/vertices g)
-                        (map (juxt identity workload))
-                        (into {}))
-
-      :num-workers num-workers
-
-      :doing       #{}
-      :done        []
-      :tick        0})))
+   (init-state g 1 (constantly 1)))
+  ([g num-workers workload]
+   {:graph       g
+    ;; tasks :: { task-name -> workload }
+    :tasks       (->> (g/vertices g)
+                      (map (juxt identity workload))
+                      (into {}))
+    :num-workers num-workers
+    :doing       #{}
+    :done        []
+    :tick        0}))
 
 (defn next-task
   "1. 위상적으로 우선이면서
@@ -50,7 +46,6 @@
 
 (defn assign-task
   [state task]
-  (:graph state)
   (-> state
       (update :doing conj task)))
 
@@ -71,18 +66,6 @@
 (defn parse [s]
   (let [[_ x y] (re-find #"Step (\S) must be finished before step (\S) can begin." s)]
     [(get x 0) (get y 0)]))
-
-(defn part1 [lines]
-  (let [g     (edges->graph (map parse lines))
-        step  (fn [s]
-                (let [t (next-task s)]
-                  (-> s
-                      (assign-task t)
-                      (finish-task t))))
-        final (->> (init-state g)
-                   (iterate step)
-                   (find-first (complement has-todo?)))]
-    (apply str (:done final))))
 
 (defn assign-one
   "idle worker가 있고, 일감이 있으면 => 일감 하나 할당 (실패시 nil)"
@@ -110,18 +93,28 @@
                              (:tasks s))]
     (reduce #(finish-task %1 %2) s finished-tasks)))
 
-(defn part2 [lines num-workers step-durations]
-  (let [g     (edges->graph (map parse lines))
-        step  (fn [s]
-                (-> s
-                    assign-all
-                    proceed
-                    cleanup))
+(defn finalize [init-state]
+  (->> init-state
+       (iterate #(-> %
+                     assign-all
+                     proceed
+                     cleanup))
+       (find-first (complement has-todo?))))
 
-        final (->> (init-state g num-workers step-durations)
-                   (iterate step)
-                   (find-first (complement has-todo?)))]
-    (:tick final)))
+(defn part1 [lines]
+  (let [g (edges->graph (map parse lines))]
+    (-> (init-state g)
+        finalize
+        :done
+        (#(apply str %)))))
+
+(defn part2 [lines num-workers step-durations]
+  (let [g        (edges->graph (map parse lines))
+        workload (fn [task] (+ (- (int task) 64)
+                               step-durations))]
+    (-> (init-state g num-workers workload)
+        finalize
+        :tick)))
 
 (let [input ["Step C must be finished before step A can begin."
              "Step C must be finished before step F can begin."

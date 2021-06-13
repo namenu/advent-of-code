@@ -10,10 +10,18 @@
   (remove-vertex [g v]))
 
 (defn topological-tops
-  [^aoc.graph.IDirectedGraph g]
+  [g]
   (->> (map second (edges g))
        (apply disj (vertices g))))
 
+(defn topological-sort
+  [g]
+  (loop [g g
+         res []]
+    (if-let [tops (seq (topological-tops g))]
+      (recur (reduce remove-vertex g tops)
+             (conj res tops))
+      res)))
 
 (defn bfs
   "adjacent-fn :: pos -> [pos]
