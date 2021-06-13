@@ -102,11 +102,12 @@
        (find-first (complement has-todo?))))
 
 (defn part1 [lines]
-  (let [g (edges->graph (map parse lines))]
-    (-> (init-state g)
-        finalize
-        :done
-        (#(apply str %)))))
+  (let [g     (edges->graph (map parse lines))
+        order (g/topological-sort g #(apply min-key int %))
+        order (-> (init-state g)
+                  finalize
+                  :done)]
+    (apply str order)))
 
 (defn part2 [lines num-workers step-durations]
   (let [g        (edges->graph (map parse lines))
@@ -131,4 +132,6 @@
 
   (part2 (input-lines 2018 7) 5 60)
 
+  (let [g (edges->graph (map parse (input-lines 2018 7)))]
+    (g/topological-sort g #(apply min-key int %)))
   )

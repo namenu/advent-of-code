@@ -15,13 +15,16 @@
        (apply disj (vertices g))))
 
 (defn topological-sort
-  [g]
-  (loop [g g
-         res []]
-    (if-let [tops (seq (topological-tops g))]
-      (recur (reduce remove-vertex g tops)
-             (conj res tops))
-      res)))
+  ([g]
+   (topological-sort g first))
+  ([g tie-breaker]
+   (loop [g   g
+          res []]
+     (if-let [tops (seq (topological-tops g))]
+       (let [top (tie-breaker tops)]
+         (recur (remove-vertex g top)
+                (conj res top)))
+       res))))
 
 (defn bfs
   "adjacent-fn :: pos -> [pos]
