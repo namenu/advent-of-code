@@ -55,7 +55,7 @@
   (let [code (->code input)]
     (->> (keep #(revise-at code %) (range (count code)))
          (map (comp run init-state))
-         (filter #(= (first %) :terminate)))))
+         (aoc/find-first #(= (first %) :terminate)))))
 
 (comment
   (def sample "nop +0\nacc +1\njmp +4\nacc +3\njmp -3\nacc -99\nacc +1\njmp -4\nacc +6")

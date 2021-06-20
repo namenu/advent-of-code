@@ -1,0 +1,10 @@
+{:paths   ["src/dev"
+           "src/main"
+           "src/test"]
+ :deps    {namenu/aoc {:local/root ".."}}
+
+ :aliases {:shadow-cljs
+           {:extra-deps {thheller/shadow-cljs            {:mvn/version "2.12.5"}
+                         tailrecursion/cljs-priority-map {:mvn/version "1.2.1"}}
+            :main-opts  ["-m" "shadow.cljs.devtools.cli"]}}
+ }

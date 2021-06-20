@@ -1,0 +1,17 @@
+{
+  "name": "aoc-visualize",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "watch": "clj -M:shadow-cljs watch app",
+    "release": "clj -M:shadow-cljs release app",
+    "build-report": "clj -M:shadow-cljs run shadow.cljs.build-report app target/build-report.html"
+  },
+  "devDependencies": {
+    "shadow-cljs": "2.14.5"
+  },
+  "dependencies": {
+    "@mojs/core": "^1.1.0",
+    "p5": "^1.3.1"
+  }
+}
