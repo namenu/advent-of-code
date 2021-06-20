@@ -1,5 +1,5 @@
 (ns aoc.year2018.day07-2
-  (:require [aoc.util :refer [input-lines find-first iterate-while]]
+  (:require [aoc.util :refer [find-first iterate-while]]
             [aoc.graph :as g]))
 
 ;; graph data structures

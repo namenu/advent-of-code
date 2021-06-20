@@ -1,12 +1,17 @@
 (ns aoc.util
-  (:require [clojure.java.io :as io]
+  (:require #?(:clj
+               [clojure.java.io :as io]
+
+               )
             [clojure.string :as str]))
 
-(defn input [year day]
-  (-> (format "year%d/day%02d.in" year day) io/resource slurp))
+#?(:clj
+   (defn input [year day]
+     (-> (format "year%d/day%02d.in" year day) io/resource slurp)))
 
-(defn input-lines [year day]
-  (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq))
+#?(:clj
+   (defn input-lines [year day]
+     (-> (format "year%d/day%02d.in" year day) io/resource io/reader line-seq)))
 
 (defn find-first [pred coll]
   (first (filter pred coll)))

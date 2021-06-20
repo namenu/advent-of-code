@@ -1,6 +1,7 @@
 (ns aoc.graph
-  (:require [clojure.data.priority-map :refer [priority-map]])
-  (:import (clojure.lang PersistentQueue)))
+  (:require [#?(:clj  clojure.data.priority-map
+                :cljs tailrecursion.priority-map)
+             :refer [priority-map]]))
 
 
 (defprotocol IDirectedGraph
@@ -26,12 +27,18 @@
                 (conj res top)))
        res))))
 
+
 (defn bfs
   "adjacent-fn :: pos -> [pos]
   Only works for unweighted graph."
   [start adjacent-fn]
   (loop [visited {start 0}
-         queue   (conj PersistentQueue/EMPTY start)]
+         queue   (conj #?(:clj
+                          clojure.lang.PersistentQueue/EMPTY
+
+                          :cljs
+                          cljs.core/PersistentQueue.EMPTY)
+                       start)]
     (if-let [cur (peek queue)]
       (let [neighbors (->> (adjacent-fn cur)
                            (remove visited))
@@ -51,6 +58,9 @@
           (recur (into reach candidates) (into (pop queue) candidates))))
       reach)))
 
+(def MAX_G #?(:clj Integer/MAX_VALUE
+              :cljs js/Number.MAX_SAFE_INTEGER))
+
 (defn A*
   "goal? :: node -> bool
    neighbor+weight :: node -> List [neighbor weight]
@@ -67,7 +77,7 @@
                                      queue' (pop queue)]
                                 (if-let [[neighbor weight] n+w]
                                   (let [tentative_g (+ g_cur weight)]
-                                    (if (< tentative_g (or (g_map' neighbor) Integer/MAX_VALUE))
+                                    (if (< tentative_g (or (g_map' neighbor) MAX_G))
                                       (recur next
                                              (assoc g_map' neighbor tentative_g)
                                              (assoc queue' neighbor (+ tentative_g (h neighbor))))
