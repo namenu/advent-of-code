@@ -13,38 +13,46 @@
          (into {}))))
 
 (defn init-state [code]
-  {:ip      0
-   :code    code
-   :acc     0
-   :history #{}})
+  {:ip   0
+   :code code
+   :acc  0})
+
+(defmulti exec (fn [_state inst] (first inst)))
+
+(defmethod exec "nop" [state _]
+  (update state :ip inc))
+
+(defmethod exec "jmp" [state [_ val]]
+  (update state :ip + val))
+
+(defmethod exec "acc" [state [_ val]]
+  (-> (update state :acc + val)
+      (update :ip inc)))
+
 
 (defn run [init-state]
-  (loop [{:keys [ip code history] :as state} init-state]
-    (let [[op val] (code ip)]
-      ;(prn [op val] (dissoc state :code))
-      (cond
-        ; found an infinite-loop!
-        (history ip) [:infinity-loop (:acc state)]
+  (loop [{:keys [ip code] :as state} init-state
+         history #{}]
+    (cond
+      ; found an infinite-loop!
+      (history ip) [:infinity-loop (:acc state)]
 
-        ; terminated gracefully
-        (= ip (count code)) [:terminate (:acc state)]
+      ; terminated gracefully
+      (= ip (count code)) [:terminate (:acc state)]
 
-        ; execute next instruction
-        :else (let [state (-> state
-                              (update :history conj ip)
-                              (update :ip inc))]
-                (case op
-                  "nop" (recur state)
-                  "jmp" (recur (assoc state :ip (+ ip val)))
-                  "acc" (recur (update state :acc #(+ % val)))
-                  ))))))
+      ; execute next instruction
+      :else (recur (exec state (code ip))
+                   (conj history ip)))))
 
 (defn part1 [input]
   (-> (->code input)
       (init-state)
       (run)))
 
-(defn revise-at [code index]
+(defn revise-at
+  "index에 해당하는 메모리에 변화를 줍니다.
+  변화를 줄 수 없으면(실패시) nil을 반환"
+  [code index]
   (let [[op val] (code index)]
     (case op
       "nop" (assoc code index ["jmp" val])
@@ -62,4 +70,6 @@
   (def input (aoc/input 2020 8))
 
   (part1 input)
-  (part2 input))
+  (time
+    (part2 input))
+  )
