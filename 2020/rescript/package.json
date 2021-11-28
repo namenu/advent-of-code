@@ -1,0 +1,19 @@
+{
+  "name": "advent-of-reason",
+  "license": "ISC",
+  "scripts": {
+    "clean": "bsb -clean-world",
+    "build": "bsb -make-world",
+    "watch": "bsb -make-world -w"
+  },
+  "dependencies": {
+    "@namenu/garter": "git+ssh://git@github.com/namenu/garter",
+    "bs-bastet": "^1.2.5",
+    "bs-let": "^0.1.16",
+    "re-vector": "git+ssh://git@github.com/reason-seoul/re-vector#51999f3d4efb206164976756ee504df850342b48"
+  },
+  "devDependencies": {
+    "@glennsl/bs-jest": "^0.6.0",
+    "bs-platform": "^8.3.3"
+  }
+}
