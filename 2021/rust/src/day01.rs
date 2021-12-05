@@ -15,23 +15,20 @@ const SAMPLE: &str = "199
 260
 263";
 
-fn part1(nums: &Vec<i32>) -> usize {
-    nums.array_windows::<2>().filter(|[a, b]| a < b).count()
-}
-
-fn part2(nums: &Vec<i32>) -> usize {
-    zip(nums.iter(), nums.iter().skip(3))
-        .filter(|(&a, &b)| a < b)
-        .count()
-}
-
-fn main() {
+let parse_input() -> &Vec<i32> {
     // let nums = SAMPLE
-    let nums = include_str!("../inputs/1.in")
+    let nums = include_str!("../inputs/01.in")
         .lines()
         .map(|n| n.parse().unwrap())
         .collect::<Vec<i32>>();
+}
 
-    println!("{}", part1(&nums));
-    println!("{}", part2(&nums));
+pub fn part1() -> usize {
+    nums.array_windows::<2>().filter(|[a, b]| a < b).count()
+}
+
+pub fn part2() -> usize {
+    zip(nums.iter(), nums.iter().skip(3))
+        .filter(|(&a, &b)| a < b)
+        .count()
 }
