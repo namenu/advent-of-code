@@ -1,9 +1,9 @@
-(ns namenu.aoc-2021
+(ns aoc.year2021.day01
   (:require [clojure.string :as str]))
 
 (def input "199\n200\n208\n210\n200\n207\n240\n269\n260\n263")
 
-(def input (slurp "resources/input.1"))
+(def input (slurp "resources/day01.in"))
 
 (def nums
   (map parse-long (str/split-lines input)))
