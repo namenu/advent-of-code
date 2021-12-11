@@ -1,9 +1,9 @@
-(ns aoc.year2021.day09
+(ns aoc.year2021.day10
   (:require [clojure.string :as str]))
 
 (def input "[({(<(())[]>[[{[]{<()<>>\n[(()[<>])]({[<{<<[]>>(\n{([(<{}[<>[]}>{[]{[(<()>\n(((({<>}<{<{<>}{[]{[]{}\n[[<[([]))<([[{}[[()]]]\n[{[{({}]{}}([{[{{{}}([]\n{<[[]]>}<{[{[{[]{()[[[]\n[<(<(<(<{}))><([]([]()\n<{([([[(<>()){}]>(<<{{\n<{([{{}}[<[[[<>{}]]]>[]]")
 
-(def input (slurp "resources/day09.in"))
+(def input (slurp "resources/day10.in"))
 
 (defn check [line]
   (let [opening  #{\{ \( \[ \<}
@@ -26,12 +26,10 @@
 
 (defn completion-score [openings]
   (let [score {\( 1, \[ 2, \{ 3, \< 4}]
-    (loop [stk   openings
-           total 0]
-      (if (seq stk)
-        (recur (pop stk)
-               (+ (* total 5) (score (peek stk))))
-        total))))
+    (reduce (fn [total b]
+              (+ (* total 5) (score b)))
+            0
+            (reverse openings))))
 
 ;; pt2
 (let [scores (->> (str/split-lines input)
