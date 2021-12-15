@@ -2,25 +2,16 @@
   (:require [aoc.util :as aoc]
             [clojure.string :as str]
             [clojure.spec.alpha :as s]
-            [clojure.spec.gen.alpha :as gen]))
+            [clojure.core.reducers :as r]))
 
 
 (s/def ::byr (s/int-in 1920 2003))
 (s/def ::iyr (s/int-in 2010 2021))
 (s/def ::eyr (s/int-in 2020 2031))
-
 (s/def ::hgt (s/or :cm (s/cat :unit #{:cm} :value (s/int-in 150 194))
                    :in (s/cat :unit #{:in} :value (s/int-in 59 77))))
-
 (s/def ::hcl (s/tuple (s/int-in 0 256) (s/int-in 0 256) (s/int-in 0 256)))
-(s/def ::ecl #{"amb"
-               "blu"
-               "brn"
-               "gry"
-               "grn"
-               "hzl"
-               "oth"})
-
+(s/def ::ecl #{"amb" "blu" "brn" "gry" "grn" "hzl" "oth"})
 (s/def ::pid (s/coll-of #{\0 \1 \2 \3 \4 \5 \6 \7 \8 \9} :count 9))
 (s/def ::cid string?)
 
@@ -69,18 +60,27 @@
   (->> (str/split-lines input)
        (map parse)
        (filter #(s/valid? ::passport %))
-       (count)))
+       count))
+
+(defn part2-fold [input]
+  (->> (str/split-lines input)
+       (r/map parse)
+       (r/filter #(s/valid? ::passport %))
+       (r/fold + (fn [acc _] (inc acc)))))
 
 (comment
-  (let [s "ecl:amb hgt:177cm hcl:#b6a3ce eyr:2025 byr:1967 pid:506927066 iyr:2018 cid:93 "
-        s "pid:859849571 ecl:amb hcl:#6b5442 hgt:193cm byr:1980 iyr:2017 eyr:2020"]
-    (s/valid? ::passport (parse s))
-    (parse s)
-    #_(when-not (s/valid? ::passport (parse s))
-        (prn)
-        (s/explain ::passport (parse s))))
+  (def input (aoc/input 2020 4))
 
-
-  @(def input (aoc/input 2020 4))
   (part2 input)
+  (part2-fold input)
+
+
+  (def large-input (str/join "\n" (repeat 1000 input)))
+
+  (time
+    (part2 large-input))
+
+  (time
+    (part2-fold large-input))
+
   )

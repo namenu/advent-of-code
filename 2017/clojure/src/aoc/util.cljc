@@ -109,28 +109,3 @@
     `(let [f# (memoize (fn ~params-with-fname
                          (let [~fname (partial ~fname ~fname)] ~@body)))]
        (partial f# f#))))
-
-(let [sensors (->> (map #(:id %) input-sensors)
-                   (db/fetch-sensors! db)
-                   (map make-sensor-type))
-      sensor-monitor-map (->> (for [sensor-alarm-monitor (db/fetch-sensor-alarm-monitors-by-sensor-ids! db (map #(:id %) sensors))]
-                                [(sensor-alarm-monitor :sensor-id) (sensor-alarm-monitor :monitor-id)])
-                              (into {}))
-      data (map #(assoc % :monitor-id (sensor-monitor-map (% :id))) sensors)]
-  (es/update-monitor-name-multi config data)
-  sensors))
-
-
-(let [sensors (->> (map :id input-sensors)
-                   (db/fetch-sensors! db)
-                   (map make-sensor-type))
-      sensor-monitor-map (->> (map :id sensors)
-                              (db/fetch-sensor-alarm-monitors-by-sensor-ids! db)
-                              (map (juxt :sensor-id :monitor-id))
-                              (into {}))
-      data (map #(assoc % :monitor-id (sensor-monitor-map (% :id))) sensors)]
-  (es/update-monitor-name-multi config data)
-  sensors))
-
-(->> (map (juxt :a :b) [{:a 10, :b 20}, {:a 100, :b 200}])
-     (into {}))

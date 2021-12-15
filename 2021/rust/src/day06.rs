@@ -47,10 +47,10 @@ pub fn part1_linear(s: &str) -> i32 {
         rhs += 1;
     }
 
-    let max = *nums.iter().max().unwrap() + 1;
+    let max = *nums.iter().max().unwrap();
     let mut min_fuel = fuel;
 
-    for pos in 0..max {
+    for pos in 0..=max {
         if let Some(v) = h.remove(&pos) {
             rhs -= v;
             fuel += lhs - rhs - v;

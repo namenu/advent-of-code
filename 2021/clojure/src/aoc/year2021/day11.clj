@@ -59,3 +59,61 @@
                  (iterate step)
                  (map synchronized?))
             true))
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+
+(require '[quil.core :as q])
+(require '[quil.middleware :as m])
+
+(def width 40)
+(def height 40)
+
+(def frames-per-step 30)
+
+(defn setup []
+  (q/smooth)
+  (q/frame-rate 60)
+  (let [state (g/parse-grid input (comp parse-long str))]
+    [state (step state)]))
+
+(defn lvl->color [lvl]
+  (if (zero? lvl)
+    255.0
+    (q/map-range lvl 1 10 32 255)))
+
+(defn lvl->scale [lvl]
+  (if (zero? lvl)
+    0.7
+    (q/map-range lvl 1 10 0.2 0.7)))
+
+(defn draw-octopus [lvl lvl']
+  (let [amt (/ (mod (q/frame-count) frames-per-step)
+               frames-per-step)
+        c   (q/lerp-color (lvl->color lvl) (lvl->color lvl') amt)
+        s   (q/lerp (lvl->scale lvl) (lvl->scale lvl') amt)]
+    (q/fill 0 0 c)
+    (q/stroke 0)
+    (q/stroke-weight 2)
+    (q/ellipse 0 0 (* width s) (* height s))))
+
+(defn draw [[state state']]
+  (q/background 0 0 32)
+
+  (doseq [[[x y] lvl] state]
+    (q/with-translation
+      [(+ (* x width) (* 0.5 width)) (+ (* y height) (* 0.5 height))]
+      (draw-octopus lvl (state' [x y])))))
+
+(defn update-state [[state state']]
+  (if (zero? (mod (q/frame-count) frames-per-step))
+    [state' (step state')]
+    [state state']))
+
+(q/defsketch day10
+  :settings #(q/smooth 2)
+  :setup setup
+  :draw draw
+  :update update-state
+  :size [(* size-x width) (* size-y height)]
+  :middleware [m/fun-mode])
