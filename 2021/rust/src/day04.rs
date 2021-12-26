@@ -1,44 +1,37 @@
 type Board = [[i8; 5]; 5];
 
 fn has_won(board: &Board) -> bool {
-    for i in 0..5 {
-        // check rows
-        let mut line = true;
-        for c in 0..5 {
-            if board[i][c] != -1 {
-                line = false;
-                break;
-            }
-        }
-        if line {
-            return true;
-        }
+    // check rows
+    if board.iter().any(|row| row.iter().all(|&x| x == -1)) {
+        return true;
+    }
 
-        // check cols
-        let mut line = true;
-        for r in 0..5 {
-            if board[r][i] != -1 {
-                line = false;
-                break;
+    // check cols
+    if (0..5).any(|col| board.iter().all(|row| row[col] == -1)) {
+        return true;
+    }
+
+    false
+}
+
+fn mark(board: &mut Board, d: i8) {
+    for r in 0..5 {
+        for c in 0..5 {
+            if board[r][c] == d {
+                board[r][c] = -1;
+                return;
             }
-        }
-        if line {
-            return true;
         }
     }
-    return false;
+}
+
+// TODO: closure 로 왜 안되지?
+fn rsum(row: &[i8; 5]) -> i32 {
+    row.iter().filter(|&v| *v != -1).map(|&v| v as i32).sum()
 }
 
 fn score(board: &Board) -> i32 {
-    let mut sum: i32 = 0;
-    for r in 0..5 {
-        for c in 0..5 {
-            if board[r][c] != -1 {
-                sum += board[r][c] as i32
-            }
-        }
-    }
-    sum
+    board.iter().map(rsum).sum()
 }
 
 struct Bingo {
@@ -76,13 +69,7 @@ impl Bingo {
     fn play(&mut self) -> i32 {
         for d in &self.draws {
             for b in self.boards.iter_mut() {
-                for r in 0..5 {
-                    for c in 0..5 {
-                        if b[r][c] == *d {
-                            b[r][c] = -1;
-                        }
-                    }
-                }
+                mark(b, *d);
             }
 
             for b in &self.boards {
@@ -98,13 +85,7 @@ impl Bingo {
         let mut result = Vec::new();
         for b in self.boards.iter_mut() {
             for (cnt, d) in self.draws.iter().enumerate() {
-                for r in 0..5 {
-                    for c in 0..5 {
-                        if b[r][c] == *d {
-                            b[r][c] = -1;
-                        }
-                    }
-                }
+                mark(b, *d);
                 if has_won(b) {
                     let score = score(b) * *d as i32;
                     result.push((cnt, score));
@@ -140,15 +121,15 @@ pub static SAMPLE: &str = "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,
  2  0 12  3  7";
 
 pub fn part1(input: &str) -> i32 {
-    let mut _bingo = Bingo::from_str(input);
+    let mut bingo = Bingo::from_str(input);
 
-    _bingo.play()
+    bingo.play()
 }
 
 pub fn part2(input: &str) -> i32 {
-    let mut _bingo = Bingo::from_str(input);
+    let mut bingo = Bingo::from_str(input);
 
-    _bingo.play2()
+    bingo.play2()
 }
 
 #[cfg(test)]
