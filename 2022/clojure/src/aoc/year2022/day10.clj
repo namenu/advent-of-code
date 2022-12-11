@@ -10,8 +10,9 @@
       "noop" [:noop]
       "addx" [:addx (parse-long x)])))
 
+(defrecord State [cycle x])
 
-(def state0 {:cycle 1 :x 1})
+(def state0 (->State 1 1))
 
 (defmulti exec (fn [_state inst] (first inst)))
 
@@ -28,18 +29,17 @@
 @(def input (slurp (clojure.java.io/resource "day10.in")))
 
 
-(let [program (->> (str/split-lines input)
-                   (map parse-inst))
+(let [program     (->> (str/split-lines input)
+                       (map parse-inst))
 
-      states  (vec (reductions exec state0 program))
+      states      (vec (reductions exec state0 program))
 
-
-      x-at    (let [cycles (->> states (mapv :cycle))]
-                (fn [cycle]
-                  (let [i (Collections/binarySearch cycles cycle)]
-                    (get states (if (neg? i)
-                                  (- (- i) 2)
-                                  i)))))
+      x-at        (let [cycles (->> states (mapv :cycle))]
+                    (fn [cycle]
+                      (let [i (Collections/binarySearch cycles cycle)]
+                        (get states (if (neg? i)
+                                      (- (- i) 2)
+                                      i)))))
 
       strength-at (fn [cycle]
                     (* cycle (:x (x-at cycle))))]
@@ -51,9 +51,31 @@
         (strength-at 180)
         (strength-at 220)]
        (apply +))
-
-  #_states
   )
 
+(comment
+  (Collections/binarySearch [1 3 5 7 9] 5 compare))
 
-(Collections/binarySearch [1 3 5 7 9] 5 compare)
+
+;; pt. 2
+
+(defn render [{:keys [cycle x]}]
+  (let [[c r] ((juxt #(rem % 40) #(quot % 40)) (dec cycle))
+        pixel (if (<= (dec x) c (inc x)) \# \.)]
+    [[c r] pixel]))
+
+(defn interpolate [[s1 s2]]
+  (for [cycle (range (:cycle s1) (:cycle s2))]
+    (->State cycle (:x s1))))
+
+(require '[aoc.grid :as g])
+
+(let [program (->> (str/split-lines input)
+                   (map parse-inst))
+
+      states  (->> (reductions exec state0 program)
+                   (partition 2 1)
+                   (mapcat interpolate))]
+
+  (let [crt (map render states)]
+    (g/print-grid (into {} crt))))

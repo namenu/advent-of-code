@@ -32,8 +32,10 @@
         min-max (map #(apply (juxt min max) %) cols)]
     (apply map vector min-max)))
 
-(defn print-grid [grid decoder]
-  (let [[[min-x min-y] [max-x max-y]] (bounding-box (keys grid))]
-    (doseq [y (range min-y (inc max-y))]
-      (let [s (map (fn [x] (decoder (grid [x y]))) (range min-x (inc max-x)))]
-        (println (apply str s))))))
+(defn print-grid
+  ([grid] (print-grid grid identity))
+  ([grid  decoder]
+   (let [[[min-x min-y] [max-x max-y]] (bounding-box (keys grid))]
+     (doseq [y (range min-y (inc max-y))]
+       (let [s (map (fn [x] (decoder (grid [x y]))) (range min-x (inc max-x)))]
+         (println (apply str s)))))))
