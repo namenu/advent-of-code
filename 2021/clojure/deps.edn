@@ -1,4 +1,4 @@
-{:deps  {org.clojure/clojure {:mvn/version "1.11.0-alpha3"}
-         medley/medley       {:mvn/version "1.3.0"}
-         quil/quil           {:mvn/version "4.0.0-SNAPSHOT"}}
+{:deps  {namenu/aoc    {:local/root "../../lib/namenu"}
+         medley/medley {:mvn/version "1.3.0"}
+         quil/quil     {:mvn/version "4.0.0-SNAPSHOT"}}
  :paths ["src" "resources"]}

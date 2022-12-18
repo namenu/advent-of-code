@@ -1,4 +1,5 @@
-{:deps    {org.clojure/core.match         {:mvn/version "1.0.0"}
+{:deps    {namenu/aoc                     {:local/root "../../lib/namenu"}
+           org.clojure/core.match         {:mvn/version "1.0.0"}
            org.clojure/math.combinatorics {:mvn/version "0.1.6"}
            org.clojure/math.numeric-tower {:mvn/version "0.0.4"}}
  :paths   ["src" "resources"]

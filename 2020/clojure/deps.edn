@@ -1,4 +1,4 @@
-{:deps    {}
+{:deps    {namenu/aoc {:local/root "../../lib/namenu"}}
  :paths   ["src" "resources"]
  :aliases {:test {:extra-paths ["test"]
                   :extra-deps  {org.clojure/test.check    {:mvn/version "1.1.0"}
