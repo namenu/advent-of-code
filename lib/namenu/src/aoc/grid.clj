@@ -1,13 +1,15 @@
 (ns aoc.grid
   (:require [clojure.string :as str]))
 
-(defn parse-grid [lines parse-fn]
-  (->> (str/split-lines lines)
-       (mapcat (fn [y line]
-                 (map-indexed (fn [x v]
-                                [[x y] (parse-fn v)]) line))
-               (range))
-       (into {})))
+(defn parse-grid
+  ([lines] (parse-grid lines identity))
+  ([lines parse-fn]
+   (->> (str/split-lines lines)
+        (mapcat (fn [y line]
+                  (map-indexed (fn [x v]
+                                 [[x y] (parse-fn v)]) line))
+                (range))
+        (into {}))))
 
 (def dirs {:north [0 1]
            :east  [1 0]
