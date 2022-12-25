@@ -16,10 +16,7 @@
 ;; bbox
 
 (def bounding-box grid/bounding-box)
-
-(defn inside? [[lower upper] coord]
-  (and (every? true? (map <= lower coord))
-       (every? true? (map >= upper coord))))
+(def inside? grid/inside?)
 
 (defn expand-1 [[lower upper]]
   [(mapv dec lower) (mapv inc upper)])

@@ -61,16 +61,30 @@
 (def MAX_G #?(:clj Integer/MAX_VALUE
               :cljs js/Number.MAX_SAFE_INTEGER))
 
+
+;(defprotocol IState
+;  (goal? [state])
+;  (estimate [state])
+;  (neighbor+weight [state]))
+
 (defn A*
-  "goal? :: node -> bool
-   neighbor+weight :: node -> List [neighbor weight]
-  `h` is a heuristic function that estimates the cost of the cheapest path from n to the goal."
+  "
+  Arguments
+  - goal? : node -> bool
+  - h : is a heuristic function that estimates the cost of the cheapest path from n to the goal.
+  - neighbor+weight : node -> List [neighbor weight]
+
+  Return - nil when success. otherwise,
+  :state - final state
+  :cost - optimal cost to reach
+  "
   [start goal? h neighbor+weight]
   (loop [g_map {start 0}
          queue (priority-map start (h start))]
     (if-let [[cur f_cur] (peek queue)]
       (if (goal? cur)
-        f_cur
+        {:state cur
+         :cost  f_cur}
         (let [g_cur (g_map cur)
               [g_map' queue'] (loop [[n+w & next] (neighbor+weight cur)
                                      g_map' g_map
@@ -84,7 +98,7 @@
                                       (recur next g_map' queue')))
                                   [g_map' queue']))]
           (recur g_map' queue')))
-      'FAIL)))
+      nil)))
 
 (defn floyd [vertices edges]
   (let [update-ij (fn [d new-d]

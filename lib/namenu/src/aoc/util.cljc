@@ -79,9 +79,6 @@
   ([start end step]
    (range start (inc end) step)))
 
-(defn manhattan-dist [a b]
-  (reduce + (map #(Math/abs ^Integer (- %1 %2)) a b)))
-
 (defn cart->polar [[x y]]
   [(Math/sqrt (+ (* x x) (* y y))) (Math/atan2 y x)])
 
@@ -109,3 +106,12 @@
     `(let [f# (memoize (fn ~params-with-fname
                          (let [~fname (partial ~fname ~fname)] ~@body)))]
        (partial f# f#))))
+
+(defmacro loop100
+  [bindings & body]
+  (let [cnt# (gensym)]
+    `(let [~cnt# (atom 100)]
+       (loop ~bindings
+         (swap! ~cnt# dec)
+         (when (pos? @~cnt#)
+           ~@body)))))
