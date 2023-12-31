@@ -1,23 +1,26 @@
 (ns year2023.day25
   (:require [clojure.string :as str]
-            [clojure.set :as set]))
+            [clojure.set :as set]
+            [year2023.graph :as g]
+            [year2023.graph.mincut :refer [karger]]))
 
-
-(defprotocol UndirectedUnweightedGraph
-  (remove-vertex [_ v])
-  (add-vertex [_ v ws])
-  (vertices-from [_ v])
-  (edges [_])
-  (vertices [_])
-  (contract-edge [_ e]))
-
-(defprotocol KargerMinCut
-  (-contract [_ t])
-  (-fast-mincut [_]))
-
-;; all vertices are connected at least one edge
 (defrecord G [es]
-  UndirectedUnweightedGraph
+  g/UndirectedUnweightedGraph
+  (vertices [_]
+    (keys es))
+  (edges [_]
+    (mapcat (fn [[u ws]]
+              (map #(vector u %) ws))
+            es))
+  (add-vertex [_ v ws]
+    (let [;; add edges from v
+          es (update es v (fnil set/union #{}) (set ws))
+          ;; add edges to v
+          es (reduce (fn [e w]
+                       (update e w (fnil conj #{}) v))
+                     es
+                     ws)]
+      (->G es)))
   (remove-vertex [_ v]
     (let [ws (es v)
           ;; remove edges from v
@@ -28,34 +31,18 @@
                      es
                      ws)]
       (->G es)))
-  (add-vertex [_ v ws]
-    (let [;; add edges from v
-          es (update es v (fnil set/union #{}) (set ws))
-          ;; add edges to v
-          es (reduce (fn [e w]
-                       (update e w (fnil conj #{}) v))
-                     es
-                     ws)]
-      (->G es)))
   (vertices-from [_ v]
     (es v))
-  (edges [_]
-    (mapcat (fn [[u ws]]
-              (map #(vector u %) ws))
-            es))
-  (vertices [this]
-    (reduce (fn [vs [u v]]
-              (conj vs u v))
-            #{}
-            (edges this)))
-
   (contract-edge [this [u v]]
     (let [uv (str u ":" v)
-          ws (set/union (disj (vertices-from this u) v) (disj (vertices-from this v) u))]
+          ws (set/union (disj (g/vertices-from this u) v) (disj (g/vertices-from this v) u))]
       (-> this
-          (remove-vertex u)
-          (remove-vertex v)
-          (add-vertex uv ws)))))
+          (g/remove-vertex u)
+          (g/remove-vertex v)
+          (g/add-vertex uv ws))))
+  (groups [this]
+    (->> (g/vertices this)
+         (map #(set (str/split % #":"))))))
 
 (def input-sample "jqt: rhn xhk nvd\nrsh: frs pzl lsr\nxhk: hfx\ncmg: qnr nvd lhk bvb\nrhn: xhk bvb hfx\nbvb: xhk hfx\npzl: lsr hfx nvd\nqnr: nvd\nntq: jqt hfx bvb xhk\nnvd: lhk\nlsr: lhk\nrzs: qnr cmg lsr rsh\nfrs: qnr lhk lsr")
 (def input-large (slurp "resources/day25.in"))
@@ -67,50 +54,18 @@
     (->> (str/split-lines input)
          (map parse-line)
          (reduce (fn [g [u ws]]
-                   (add-vertex g u ws))
+                   (g/add-vertex g u ws))
                  (->G {})))))
 
-(let [g (parse-input input-sample)]
-  (-> g
-      (contract-edge ["hfx" "bvb"])))
-
-(defn contract [g t]
-  (if (> (count (vertices g)) t)
-    (let [[u v] (rand-nth (edges g))]
-      (recur (contract-edge g [u v]) t))
-    g))
+(comment
+  ;; part 1
+  (let [g0 (parse-input input-large)
+        [st cuts] (karger g0)]
+    (let [[s t] (g/groups st)]
+      (* (count s) (count t))))
 
 
-(defn cuttable [g find-cuts]
-  (reify
-    KargerMinCut
-    (-contract [_ t]
-      (loop [g g]
-        (if (> (count (vertices g)) t)
-          (let [[u v] (rand-nth (edges g))]
-            (recur (contract-edge g [u v])))
-          g)))
-
-    (-fast-mincut [_]
-      (if (<= (count (vertices g)) 6)
-        (do
-          (prn (count (vertices g)))
-          (contract g 2))
-        (let [t  (int (Math/ceil (+ 1 (/ (count (vertices g)) (Math/sqrt 2)))))
-              g1 (contract g t)
-              g2 (contract g t)
-              k1 (-fast-mincut (cuttable g1 find-cuts))
-              k2 (-fast-mincut (cuttable g2 find-cuts))]
-          (min-key #(count (find-cuts %)) k1 k2))))))
-
-(let [g0        (parse-input input-large)
-      es        (set (edges g0))
-      find-cuts (fn [g]
-                  ;; g must be a bipartitioned graph
-                  (let [[s t] (vec (vertices g))]
-                    (set/intersection (set (for [u (str/split s #":")
-                                                 v (str/split t #":")]
-                                             [u v]))
-                                      es)))]
-  #_(-contract (cuttable g0 count-cuts) 2)
-  (find-cuts (-fast-mincut (cuttable g0 find-cuts))))
+  ;; convert to .dot format
+  (println
+    (-> (str/replace input-sample ": " "--")
+        (str/replace " " ","))))
